@@ -1,6 +1,6 @@
 services:
-  dotnet:
-    image: dotnet
+  python:
+    image: python
     restart: always
     networks:
       - traefik-public
@@ -8,23 +8,6 @@ services:
       mode: replicated
       labels:
         - traefik
-
-  react:
-    image: react
-    networks:
-      - traefik-public
-    deploy:
-      mode: replicated
-      replicas: 3
-      labels:
-       - traefik
-
-  db-version:
-    image: sql-something
-    networks:
-      - traefik-public
-    deploy:
-
   api:
     image: ${CI_REGISTRY}/${CI_PROJECT_NAMESPACE}/${CI_PROJECT_NAME}:${DOCKER_TAG}
     restart: always
