@@ -15,28 +15,16 @@ variables:
     - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
     - cd "$PIPELINE_UTILS"
 
-# Generate and publish a new Dockerimage of our .NET-application
+# Generate and publish a new Dockerimage of our -application
 # Runs on any change in back-end folder (TODO: specify)
-build-dotnet-image:
+build-python-image:
   <<: *build_image_template
   script:
-    - export IMAGE_NAME="$CI_REGISTRY_IMAGE/dotnet:latest"
+    - export IMAGE_NAME="$CI_REGISTRY_IMAGE/python:latest"
     - echo "Building $IMAGE_NAME"
   rules:
     - changes:
         - back-end/*
-
-# Generate and publish a new Dockerimage of our React-application
-# Runs on any change in front-end folder (TODO: specify)
-build-react-image:
-  <<: *build_image_template
-  script:
-    - export IMAGE_NAME="$CI_REGISTRY_IMAGE/react:latest"
-    - echo "Building $IMAGE_NAME"
-  rules:
-    - changes:
-        - front-end/*
-
 # Build image containing with required python packages and script to deploy on Portainer
 # ONLY build on when on main branch and any relevant files change
 build-utils:
@@ -44,12 +32,12 @@ build-utils:
   script:
     - export IMAGE_NAME="$CI_REGISTRY_IMAGE/utils:latest"
     - echo "Building $IMAGE_NAME"
-    - docker buildx build --cache-from="$IMAGE_NAME" -t "$IMAGE_NAME" --push -f Dockerfile-utils .
+    - docker buildx build --cache-from="$IMAGE_NAME" -t "$IMAGE_NAME" --push -f Dockerfile .
   rules:
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
       changes:
-        - $PIPELINE_UTILS/Dockerfile-utils
-        - $PIPELINE_UTILS/requirements-api-handler.txt
+        - $PIPELINE_UTILS/Dockerfile
+        - $PIPELINE_UTILS/requirements.txt
         - $PIPELINE_UTILS/portainer.py
 
 # Run all (fake) tests on codechange and ONLY on branches where there is a merge request
