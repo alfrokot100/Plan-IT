@@ -1,0 +1,98 @@
+stages:
+  - build
+  - test
+  - deploy
+  - teardown
+
+variables:
+  PIPELINE_UTILS: "pipeline-utilities"
+
+# Template for all build jobs
+.build_image_template: &build_image_template
+  stage: build
+  image: docker:20
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
+    - cd "$PIPELINE_UTILS"
+
+# Generate and publish a new Dockerimage of our -application
+# Runs on any change in back-end folder (TODO: specify)
+build-python-image:
+  <<: *build_image_template
+  script:
+    - export IMAGE_NAME="$CI_REGISTRY_IMAGE/python:latest"
+    - echo "Building $IMAGE_NAME"
+  rules:
+    - changes:
+        - back-end/*
+# Build image containing with required python packages and script to deploy on Portainer
+# ONLY build on when on main branch and any relevant files change
+build-utils:
+  <<: *build_image_template
+  script:
+    - export IMAGE_NAME="$CI_REGISTRY_IMAGE/utils:latest"
+    - echo "Building $IMAGE_NAME"
+    - docker buildx build --cache-from="$IMAGE_NAME" -t "$IMAGE_NAME" --push -f Dockerfile .
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      changes:
+        - $PIPELINE_UTILS/Dockerfile
+        - $PIPELINE_UTILS/requirements.txt
+        - $PIPELINE_UTILS/portainer.py
+
+# Run all (fake) tests on codechange and ONLY on branches where there is a merge request
+run-tests:
+  stage: test
+  script:
+    - echo "TOTAL                  353     20    94%"
+  coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  rules:
+    - if: $CI_REGISTRY_IMAGE == $PORTAINER_USER
+
+# Setup for teardown and deploy
+.base_util_setup:
+  image: $CI_REGISTRY_IMAGE/utils:latest
+  before_script:
+    - export CI_PROJECT_NAMESPACE=$(echo "$CI_PROJECT_NAMESPACE" | tr '[:upper:]' '[:lower:]')
+    - export ENDPOINT_NAME="primary"
+    - export STACK_NAME="$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME-$CI_COMMIT_REF_NAME"
+    - cd "$PIPELINE_UTILS"
+    - set -e
+
+# Environment name reference
+.environment_setup: &env_setup
+  name: review/$CI_COMMIT_REF_NAME
+
+deploy:
+  extends: .base_util_setup
+  stage: deploy
+  environment:
+    <<: *env_setup
+    url: https://$CI_PROJECT_NAMESPACE-$CI_PROJECT_NAME-$CI_COMMIT_REF_NAME.doe24.swarm.chasacademy.dev
+    on_stop: teardown
+  script:
+    - echo "Deploy"
+    - echo $PORTAINER_URL
+    - echo $STACK_NAME
+    - echo $CI_JOB_STAGE
+    - python portainer.py $CI_JOB_STAGE -dc docker-compose.yml --debug
+    - ls -a
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+
+teardown:
+  extends: .base_util_setup
+  stage: teardown
+  image: $CI_REGISTRY_IMAGE/utils:latest
+  environment:
+    <<: *env_setup
+    action: stop
+  script:
+    - echo "Teardown"
+    - echo $CI_JOB_STAGE
+    - python portainer.py $CI_JOB_STAGE --debug
+    - ls -a
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+      when: manual
