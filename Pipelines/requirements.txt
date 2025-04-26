@@ -1,1 +1,8 @@
-fastapi[standard]
+fastapi[standard] 
+httpx
+argparse
+os
+json
+re
+sys
+pprint
