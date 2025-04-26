@@ -1,0 +1,12 @@
+# Base MSSQL image
+FROM mcr.microsoft.com/mssql/server:2022-latest
+
+# Set working directory
+WORKDIR /usr/src/app
+
+# Copy initialization scripts
+COPY db-entrypoint.sh .
+COPY db-init.sql .
+
+# Run entrypoint script to start MSSQL and initialize the database
+CMD ["/bin/bash", "./db-entrypoint.sh"]
