@@ -1,0 +1,60 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  DOCKER_TAG: "$CI_COMMIT_REF_NAME"
+  STACK_NAME: "plan-it"
+
+services:
+  - docker:dind
+
+build-backend:
+  stage: build
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - docker build -t "$CI_REGISTRY_IMAGE/backend:$DOCKER_TAG" ./backend
+    - docker push "$CI_REGISTRY_IMAGE/backend:$DOCKER_TAG"
+
+build-frontend:
+  stage: build
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - docker build -t "$CI_REGISTRY_IMAGE/frontend:$DOCKER_TAG" ./frontend
+    - docker push "$CI_REGISTRY_IMAGE/frontend:$DOCKER_TAG"
+
+build-db:
+  stage: build
+  script:
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "$CI_REGISTRY"
+    - docker build -t "$CI_REGISTRY_IMAGE/db:$DOCKER_TAG" ./database
+    - docker push "$CI_REGISTRY_IMAGE/db:$DOCKER_TAG"
+
+test-backend:
+  stage: test
+  script:
+    - cd backend
+    - dotnet test
+
+test-frontend:
+  stage: test
+  script:
+    - cd frontend
+    - npm install
+    - npm test
+
+deploy:
+  stage: deploy
+  image: curlimages/curl:latest
+  script:
+    - echo "Deploying stack to Portainer..."
+    - export PORTAINER_AUTH=$(curl -s -X POST "$PORTAINER_URL/api/auth" \
+        -H "Content-Type: application/json" \
+        -d "{\"Username\":\"$PORTAINER_USER\",\"Password\":\"$PORTAINER_PW\"}" | jq -r .jwt)
+    - curl -s -X POST "$PORTAINER_URL/api/stacks" \
+        -H "Authorization: Bearer $PORTAINER_AUTH" \
+        -H "Content-Type: application/json" \
+        -d @docker-compose.yml
+  only:
+    - main
