@@ -1,0 +1,36 @@
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+
+namespace TeamApp.Models
+{
+    public class User
+    {
+        [Key]
+        public int UserID { get; set; }
+
+        //Foreign Keys
+        [ForeignKey("Team")]
+        public int? TeamID_FK { get; set; }
+        public virtual Team? Team { get; set; }
+
+        [StringLength(50, MinimumLength = 2)]
+        public string Username { get; set; }
+
+        [StringLength(50, MinimumLength = 5)]
+        public string Password { get; set; }//Lösenord bör inte lagras i text
+
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [StringLength(50, MinimumLength = 3)]
+        public string Role { get; set; }
+
+        // Relationer till andra entiteter
+        //För att skapa 1 -> M relationer
+        public virtual ICollection<Goal> Goals { get; set; } = new List<Goal>();
+        public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
+        public virtual ICollection<LogEntry> LogEntries { get; set; } = new List<LogEntry>();
+        public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
+        public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+    }
+}
