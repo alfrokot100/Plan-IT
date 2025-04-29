@@ -4,8 +4,8 @@ stages:
   - deploy
 
 variables:
-  FRONTEND_FOLDER: "dockerfile-react"
-  BACKEND_FOLDER: "dockerfile-.net"
+  FRONTEND_FOLDER: "frontend"
+  BACKEND_FOLDER: "backend"
   DATABASE_FOLDER: "database"
   REGISTRY_PATH: "$CI_REGISTRY/chas-challenge-2025/group-13/plan-it"
 
@@ -19,6 +19,7 @@ build-backend-image:
   stage: build
   script:
     - cd "$BACKEND_FOLDER"
+    -ls -la #debugging step to confirm the dockerfile exists
     - export IMAGE_NAME="$CI_REGISTRY_IMAGE/backend:$DOCKER_TAG"
     - echo "Building $IMAGE_NAME"
     - docker buildx build --cache-from="$IMAGE_NAME" -t "$IMAGE_NAME" --push -f Dockerfile .
