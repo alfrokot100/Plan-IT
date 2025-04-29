@@ -10,6 +10,6 @@ namespace TeamApp.DTOs.TaskDTO
         public int TaskID { get; set; }
         [Required]
         public string Title { get; set; }
-        public bool? IsDone { get; set; }
+        public string Status { get; set; }
     }
 }

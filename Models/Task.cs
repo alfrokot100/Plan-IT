@@ -21,7 +21,9 @@ namespace TeamApp.Models
         [Required]
         [StringLength(25, MinimumLength = 5)]
         public string Title { get; set; }
-        public bool IsDone { get; set; }
+        [Required]
+        [RegularExpression("^(Avslutad|Påbörjad|Pausad)$", ErrorMessage = "Ogiltig status")]
+        public string Status { get; set; }
 
         [Required]
         public DateTime? DueDate { get; set; }
