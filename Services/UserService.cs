@@ -76,5 +76,16 @@ namespace TeamApp.Services
             return userList;
         }
 
+        public async Task<List<TaskDTO>> GetTasksByUser(int userId)
+        {
+            var taskList = await context.Tasks.Where(t => t.UserID_FK == userId).Select(t => new TaskDTO
+            {
+                TaskID = t.TaskID,
+                Title = t.Title,
+                DueDate = t.DueDate,
+                Status = t.Status
+            }).ToListAsync();
+            return taskList;
+        }
     }
 }
