@@ -1,62 +1,74 @@
-
- version: '3.8'
+version: '3.8'
 
 services:
   backend:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
-    ports:
-      - "5000:5000"
-    depends_on:
-      - db
+    image: registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/backend:${DOCKER_TAG}
+    networks:
+      - app-network
+      - traefik-public
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+        - traefik.http.routers.api-${STACK_NAME}-http.rule=Host(`api.${STACK_NAME}.cc25.chasacademy.dev`)
+        - traefik.http.routers.api-${STACK_NAME}-http.entrypoints=http
+        - traefik.http.routers.api-${STACK_NAME}-http.middlewares=https-redirect
+        - traefik.http.routers.api-${STACK_NAME}-https.rule=Host(`api.${STACK_NAME}.cc25.chasacademy.dev`)
+        - traefik.http.routers.api-${STACK_NAME}-https.entrypoints=https
+        - traefik.http.routers.api-${STACK_NAME}-https.tls=true
+        - traefik.http.services.api-${STACK_NAME}.loadbalancer.server.port=5000
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:5000
-      - ConnectionStrings__DefaultConnection=Server=db;Database=PlanIT;User=sa;Password=${DB_PASSWORD};TrustServerCertificate=True
-    networks:
-      - app-network
+      - ConnectionStrings__DefaultConnection=Server=database;Database=PlanIT;User=sa;Password=${DB_PASSWORD};TrustServerCertificate=True
+    depends_on:
+      - database
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - "3000:80"
+    image: registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/frontend:${DOCKER_TAG}
+    networks:
+      - app-network
+      - traefik-public
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+        - traefik.http.routers.${STACK_NAME}-http.rule=Host(`${STACK_NAME}.cc25.chasacademy.dev`)
+        - traefik.http.routers.${STACK_NAME}-http.entrypoints=http
+        - traefik.http.routers.${STACK_NAME}-http.middlewares=https-redirect
+        - traefik.http.routers.${STACK_NAME}-https.rule=Host(`${STACK_NAME}.cc25.chasacademy.dev`)
+        - traefik.http.routers.${STACK_NAME}-https.entrypoints=https
+        - traefik.http.routers.${STACK_NAME}-https.tls=true
+        - traefik.http.services.${STACK_NAME}.loadbalancer.server.port=80
     environment:
       - API_URL=http://backend:5000
+
+  database:
+    image: registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/database:${DOCKER_TAG}
     networks:
       - app-network
-
-  db:
-    build:
-      context: ./database
-      dockerfile: Dockerfile
+    deploy:
+      mode: replicated
+      replicas: 1
     environment:
-      SA_PASSWORD: ${DB_PASSWORD}
-      ACCEPT_EULA: "Y"
-      MSSQL_PID: "Developer"
-    ports:
-      - "1433:1433"
+      - ACCEPT_EULA=YES
+      - MSSQL_SA_PASSWORD=${DB_PASSWORD}
+      - MSSQL_PID=Developer
     volumes:
       - db_data:/var/opt/mssql
-    networks:
-      - app-network
 
-  portainer:
-    image: portainer/portainer-ce
-    ports:
-      - "9000:9000"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - portainer_data:/data
-    networks:
-      - app-network
+networks:
+  traefik-public:
+    external: true
+  app-network:
+    driver: bridge
 
 volumes:
   db_data:
-  portainer_data:
-
-networks:
-  app-network:
-    driver: bridge
+ 
