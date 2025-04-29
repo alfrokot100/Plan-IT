@@ -4,8 +4,8 @@ stages:
   - deploy
 
 variables:
-  FRONTEND_FOLDER: "frontend"
-  BACKEND_FOLDER: "backend"
+  FRONTEND_FOLDER: "dockerfile-react"
+  BACKEND_FOLDER: "dockerfile-.net"
   DATABASE_FOLDER: "database"
   REGISTRY_PATH: "$CI_REGISTRY/chas-challenge-2025/group-13/plan-it"
 
