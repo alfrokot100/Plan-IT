@@ -1,4 +1,5 @@
-version: '3.8'
+
+ version: '3.8'
 
 services:
   backend:
@@ -23,12 +24,14 @@ services:
     ports:
       - "3000:80"
     environment:
-      - API_URL=http://localhost:5000
+      - API_URL=http://backend:5000
     networks:
       - app-network
 
   db:
-    image: mcr.microsoft.com/mssql/server:2022-latest
+    build:
+      context: ./database
+      dockerfile: Dockerfile
     environment:
       SA_PASSWORD: ${DB_PASSWORD}
       ACCEPT_EULA: "Y"
