@@ -1,52 +1,106 @@
-
-   stages:
+stages:
+  - check
   - build
   - test
   - deploy
+  - teardown
 
 variables:
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: ""
+  PIPELINE_UTILS: "pipeline-utilities"
 
-before_script:
-  - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
-
-build-backend:
+# Template for all build jobs
+.build_image_template: &build_image_template
   stage: build
-  script:
-    - docker build -t $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_NAME ./backend
-    - docker push $CI_REGISTRY_IMAGE/backend:$CI_COMMIT_REF_NAME
-  only:
-    changes:
-      - backend/**
+  image: docker:latest
+  variables:
+    FRONTEND_FOLDER: "frontend"
+    BACKEND_FOLDER: "backend"
+    DATABASE_FOLDER: "database"
+    REGISTRY_PATH: "$CI_REGISTRY/chas-challenge-2025/group-13/plan-it"
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
+    - export CI_COMMIT_REF_NAME=$(echo "$CI_COMMIT_REF_NAME" | tr '[:upper:]' '[:lower:]')
+    - if [[ $CI_COMMIT_REF_NAME = $CI_DEFAULT_BRANCH ]]; then DOCKER_TAG=latest; else DOCKER_TAG=$CI_COMMIT_REF_NAME; fi
 
-build-frontend:
-  stage: build
+# Build and publish the backend Docker image
+build-backend-image:
+  <<: *build_image_template
   script:
-    - docker build -t $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_NAME ./frontend
-    - docker push $CI_REGISTRY_IMAGE/frontend:$CI_COMMIT_REF_NAME
-  only:
-    changes:
-      - frontend/**
+    - cd "$BACKEND_FOLDER"
+    - export IMAGE_NAME="$CI_REGISTRY_IMAGE/backend:$DOCKER_TAG"
+    - echo "Building $IMAGE_NAME"
+    - docker buildx build --cache-from="$IMAGE_NAME" -t "$IMAGE_NAME" --push -f Dockerfile .
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_MERGE_REQUEST_ID
+      changes:
+        - $BACKEND_FOLDER/**/*
 
-build-database:
-  stage: build
+# Build and publish the frontend Docker image
+build-frontend-image:
+  <<: *build_image_template
   script:
-    - docker build -t $CI_REGISTRY_IMAGE/database:$CI_COMMIT_REF_NAME ./database
-    - docker push $CI_REGISTRY_IMAGE/database:$CI_COMMIT_REF_NAME
-  only:
-    changes:
-      - database/**
+    - cd "$FRONTEND_FOLDER"
+    - export IMAGE_NAME="$CI_REGISTRY_IMAGE/frontend:$DOCKER_TAG"
+    - echo "Building $IMAGE_NAME"
+    - docker buildx build --cache-from="$IMAGE_NAME" -t "$IMAGE_NAME" --push -f Dockerfile .
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_MERGE_REQUEST_ID
+      changes:
+        - $FRONTEND_FOLDER/**/*
 
-test:
+# Build and publish the database Docker image
+build-database-image:
+  <<: *build_image_template
+  script:
+    - cd "$DATABASE_FOLDER"
+    - export IMAGE_NAME="$CI_REGISTRY_IMAGE/database:$DOCKER_TAG"
+    - echo "Building $IMAGE_NAME"
+    - docker buildx build --cache-from="$IMAGE_NAME" -t "$IMAGE_NAME" --push -f Dockerfile .
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_MERGE_REQUEST_ID
+      changes:
+        - $DATABASE_FOLDER/**/*
+
+# Run tests
+run-tests:
   stage: test
   script:
     - echo "Running tests..."
     - echo "Tests passed!"
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
 
+# Deploy the stack to Portainer
 deploy:
   stage: deploy
+  image: $CI_REGISTRY_IMAGE/utils:latest
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    url: https://g13-$CI_COMMIT_REF_SLUG.cc25.chasacademy.dev
+    on_stop: teardown
   script:
-    - docker stack deploy -c docker-compose.yml planit
-  only:
-    - main
+    - echo "Deploying stack..."
+    - if [[ $CI_COMMIT_REF_NAME = $CI_DEFAULT_BRANCH ]]; then DOCKER_COMPOSE=docker-compose.yml; else DOCKER_COMPOSE=docker-compose-test.yml; fi
+    - python portainer.py deploy -dc $DOCKER_COMPOSE
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_MERGE_REQUEST_ID
+
+# Teardown the stack
+teardown:
+  stage: teardown
+  image: $CI_REGISTRY_IMAGE/utils:latest
+  environment:
+    name: review/$CI_COMMIT_REF_NAME
+    action: stop
+  script:
+    - echo "Tearing down stack..."
+    - python portainer.py teardown
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+      when: manual
+   
+    
