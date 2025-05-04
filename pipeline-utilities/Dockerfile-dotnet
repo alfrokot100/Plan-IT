@@ -1,0 +1,24 @@
+# Use dotnet SDK image to build, use dotnet runtime image to run app?
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+
+# Copy csproj which stores dependencies, and restore them
+COPY *.csproj .
+# COPY *.esproj rekurrens.client/rekurrens.client.esproj
+RUN dotnet restore rekurrens.server.csproj
+
+# Copy the rest and build
+COPY . .
+RUN dotnet publish rekurrens.server.csproj -property:AssemblyName=Rekurrens -o /app/out
+
+# Move to runtime image
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+WORKDIR /app
+COPY --from=build /app/out .
+
+# Default http port?
+EXPOSE 80
+
+# Entrypoint
+ENTRYPOINT ["dotnet", "Rekurrens.dll"]

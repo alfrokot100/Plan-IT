@@ -1,0 +1,78 @@
+# This pipeline only exists to generate base images on a new MR when someone only pushes changes to
+# one part of the program. To prevent missing imagetags not being generated
+
+stages:
+  - check
+  - build
+
+variables:
+  PIPELINE_UTILS: "pipeline-utilities"
+
+# Template for all build jobs
+.build_image_template: &build_image_template
+  stage: build
+  image: docker:latest
+  variables:
+    REACT_FOLDER: "rekurrens.client"
+    DOTNET_FOLDER: "Rekurrens.Server"
+    REGISTRY_PATH: "$CI_REGISTRY/chas-challenge-2025/group-12/rekurrens"
+  before_script:
+    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY -u $CI_REGISTRY_USER --password-stdin
+    - export CI_COMMIT_REF_NAME=$(echo "$CI_COMMIT_REF_NAME" | tr '[:upper:]' '[:lower:]')
+    - if [[ $CI_COMMIT_REF_NAME = $CI_DEFAULT_BRANCH ]]; then DOCKER_TAG=latest; else DOCKER_TAG=$CI_COMMIT_REF_NAME; fi
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "parent_pipeline"
+
+# Uses docker manifest to check if specific tag for an image exists
+# Triggers all build jobs on failure, else fails and quits back to main pipeline
+check-docker-images:
+  <<: *build_image_template
+  # Override stage
+  stage: check
+  script:
+    - echo "Checking if dockerimages have already been built"
+    # Dont have to check all tags, if one is missing all are missing
+    - |
+      if docker manifest inspect $REGISTRY_PATH/dotnet:$DOCKER_TAG; then
+        echo "Images exist, dont build"
+        exit 0
+      else
+        echo "Images do not exist, running build jobs"
+        exit 1
+      fi
+
+# Generate and publish a new Dockerimage of our .NET-application
+build-dotnet-image:
+  <<: *build_image_template
+  script:
+    - cp "$PIPELINE_UTILS"/Dockerfile-dotnet "$DOTNET_FOLDER"
+    - cp "$REACT_FOLDER"/rekurrens.client.esproj "$DOTNET_FOLDER"
+    - cd "$DOTNET_FOLDER"
+    - export IMAGE_NAME="$CI_REGISTRY_IMAGE/dotnet:$DOCKER_TAG"
+    - echo "Building $IMAGE_NAME"
+    - docker buildx build --cache-from="$IMAGE_NAME" -t "$IMAGE_NAME" --push -f Dockerfile-dotnet .
+  when: on_failure
+
+# Generate and publish a new Dockerimage of our React-application
+build-react-image:
+  <<: *build_image_template
+  script:
+    - cp "$PIPELINE_UTILS"/vite.config.docker.js "$REACT_FOLDER"
+    - cp "$PIPELINE_UTILS"/Dockerfile-react "$REACT_FOLDER"
+    - cd "$REACT_FOLDER"
+    - export IMAGE_NAME="$CI_REGISTRY_IMAGE/react:$DOCKER_TAG"
+    - echo "Building $IMAGE_NAME"
+    - docker buildx build --cache-from="$IMAGE_NAME" -t "$IMAGE_NAME" --push -f Dockerfile-react .
+  when: on_failure
+
+# Generates an image of MSSQL and loads specified state from SQL file
+build-db-image:
+  <<: *build_image_template
+  script:
+    - cd "$PIPELINE_UTILS"
+    - export IMAGE_NAME="$CI_REGISTRY_IMAGE/mssql-db:$DOCKER_TAG"
+    # Main branch use prod init, MR use dev init
+    - if [[ $CI_COMMIT_REF_NAME = $CI_DEFAULT_BRANCH ]]; then mv prod-db-init.sql db-init.sql; else mv dev-db-init.sql db-init.sql; fi
+    - echo "Building $IMAGE_NAME"
+    - docker buildx build --cache-from="$IMAGE_NAME" -t "$IMAGE_NAME" --push -f Dockerfile-db .
+  when: on_failure
