@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using TeamApp.Models;
 
 namespace TeamApp.DTOs.UserDTO
 {
@@ -14,5 +15,6 @@ namespace TeamApp.DTOs.UserDTO
         [StringLength(50, MinimumLength = 2)]
         public string Password { get; set; }
         public string? Role { get; set; }
+        public virtual ICollection<UserTask> UserTasks { get; set; }
     }
 }

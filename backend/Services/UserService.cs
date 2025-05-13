@@ -1,10 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using TeamApp.Data;
 using TeamApp.DTOs.CommentDTO;
 using TeamApp.DTOs.GoalDTO;
 using TeamApp.DTOs.TaskDTO;
 using TeamApp.DTOs.TeamDTO;
 using TeamApp.DTOs.UserDTO;
+using TeamApp.Models;
 
 namespace TeamApp.Services
 {
@@ -15,7 +18,7 @@ namespace TeamApp.Services
         //Dependancy injection
         public UserService(TeamDBContext _context)
         {
-            context = _context;   
+            context = _context;
         }
 
         public async Task<List<CommentDTO>> GetAllComments()
@@ -48,7 +51,6 @@ namespace TeamApp.Services
                 TaskID = t.TaskID,
                 Title = t.Title,
                 DueDate = t.DueDate,
-                IsDone = t.IsDone
             }).ToListAsync();
             return taskList;
         }
@@ -76,16 +78,5 @@ namespace TeamApp.Services
             return userList;
         }
 
-        public async Task<List<TaskDTO>> GetTasksByUser(int userId)
-        {
-            var taskList = await context.Tasks.Where(t => t.UserID_FK == userId).Select(t => new TaskDTO
-            {
-                TaskID = t.TaskID,
-                Title = t.Title,
-                DueDate = t.DueDate,
-                Status = t.Status
-            }).ToListAsync();
-            return taskList;
-        }
     }
 }

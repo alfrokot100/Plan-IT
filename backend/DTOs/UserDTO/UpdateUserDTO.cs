@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using TeamApp.Models;
 
 namespace TeamApp.DTOs.UserDTO
 {
@@ -12,5 +13,7 @@ namespace TeamApp.DTOs.UserDTO
         [Required]
         [EmailAddress]
         public string Email { get; set; }
+
+        public virtual ICollection<UserTask> UserTasks { get; set; }
     }
 }
