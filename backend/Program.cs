@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using TeamApp.Data;
 using TeamApp.Endpoints.TeamEndpoints;
 using TeamApp.Services;
+using TeamApp.Endpoints.TaskEndpoints;
 
 namespace TeamApp
 {
@@ -25,7 +26,21 @@ namespace TeamApp
             });
 
             builder.Services.AddScoped<UserService>();
-            
+
+            builder.Services.AddScoped<TaskService>();
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("MyReactApp", policy =>
+                {
+                    // se till att länken här matchar din frontend!
+                    policy.WithOrigins("http://localhost:5173")
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+                });
+            });
+
+            builder.Services.AddHttpClient();
 
             var app = builder.Build();
 
@@ -38,9 +53,11 @@ namespace TeamApp
 
             app.UseHttpsRedirection();
 
+            app.UseCors("MyReactApp");
             app.UseAuthorization();
 
             TeamEndpoints.RegisterEndpoints(app);
+            TaskEndpoints.RegisterEndpoints(app);
 
             app.Run();
         }
