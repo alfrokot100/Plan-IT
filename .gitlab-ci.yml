@@ -21,7 +21,7 @@ build-backend:
   stage: build
   image: docker:latest
   script:
-    - docker build -t registry.example.com/plan-IT/backend:${DOCKER_TAG} ./backend
+    - docker build -t registry.example.com/plan-it/backend:${DOCKER_TAG} ./backend
     - docker push registry.example.com/plan-it/backend:${DOCKER_TAG}
 
 # Build database image
@@ -45,7 +45,7 @@ deploy:
   stage: deploy
   image: docker:latest
   script:
-    - docker stack deploy --compose-file docker-compose.yml plan-IT
+    - docker stack deploy --compose-file docker-compose.yml plan-it
   environment:
     name: production/$CI_COMMIT_REF_NAME
     url: https://$CI_PROJECT_NAME.$CI_ENVIRONMENT_SLUG.example.dev
