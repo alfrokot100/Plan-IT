@@ -21,7 +21,7 @@ namespace TeamApp.Data
         public DbSet<Task> Tasks { get; set; }
         public DbSet<Team> Teams { get; set; }
         public DbSet<Comment> Comments { get; set; }
-
+        public DbSet<UserTask> UserTasks { get; set; }
 
 
 

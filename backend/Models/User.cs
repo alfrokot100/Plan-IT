@@ -28,7 +28,7 @@ namespace TeamApp.Models
         // Relationer till andra entiteter
         //För att skapa 1 -> M relationer
         public virtual ICollection<Goal> Goals { get; set; } = new List<Goal>();
-        public virtual ICollection<Task> Tasks { get; set; } = new List<Task>();
+        public virtual ICollection<UserTask> UserTasks { get; set; }
         public virtual ICollection<LogEntry> LogEntries { get; set; } = new List<LogEntry>();
         public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public virtual ICollection<Notification> Notifications { get; set; } = new List<Notification>();
