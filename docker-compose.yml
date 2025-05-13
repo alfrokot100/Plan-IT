@@ -2,73 +2,78 @@ version: '3.8'
 
 services:
   backend:
-    image: registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/backend:${DOCKER_TAG}
-    networks:
-      - app-network
-      - traefik-public
+    image: registry.example.com/plan-it/backend:${DOCKER_TAG}
     deploy:
-      mode: replicated
-      replicas: 1
-      labels:
-        - traefik.enable=true
-        - traefik.docker.network=traefik-public
-        - traefik.constraint-label=traefik-public
-        - traefik.http.routers.api-${STACK_NAME}-http.rule=Host(`api.${STACK_NAME}.cc25.chasacademy.dev`)
-        - traefik.http.routers.api-${STACK_NAME}-http.entrypoints=http
-        - traefik.http.routers.api-${STACK_NAME}-http.middlewares=https-redirect
-        - traefik.http.routers.api-${STACK_NAME}-https.rule=Host(`api.${STACK_NAME}.cc25.chasacademy.dev`)
-        - traefik.http.routers.api-${STACK_NAME}-https.entrypoints=https
-        - traefik.http.routers.api-${STACK_NAME}-https.tls=true
-        - traefik.http.services.api-${STACK_NAME}.loadbalancer.server.port=5000
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:5000
-      - ConnectionStrings__DefaultConnection=Server=database;Database=PlanIT;User=sa;Password=${DB_PASSWORD};TrustServerCertificate=True
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 2
+        delay: 10s
+    ports:
+      - "5000:5000"
     depends_on:
       - database
-
-  frontend:
-    image: registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/frontend:${DOCKER_TAG}
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ASPNETCORE_URLS: http://+:5000
+      ConnectionStrings__DefaultConnection: Server=database;Database=TeamAppDB;User=sa;Password=${DB_PASSWORD};TrustServerCertificate=True
     networks:
       - app-network
-      - traefik-public
-    deploy:
-      mode: replicated
-      replicas: 1
-      labels:
-        - traefik.enable=true
-        - traefik.docker.network=traefik-public
-        - traefik.constraint-label=traefik-public
-        - traefik.http.routers.${STACK_NAME}-http.rule=Host(`${STACK_NAME}.cc25.chasacademy.dev`)
-        - traefik.http.routers.${STACK_NAME}-http.entrypoints=http
-        - traefik.http.routers.${STACK_NAME}-http.middlewares=https-redirect
-        - traefik.http.routers.${STACK_NAME}-https.rule=Host(`${STACK_NAME}.cc25.chasacademy.dev`)
-        - traefik.http.routers.${STACK_NAME}-https.entrypoints=https
-        - traefik.http.routers.${STACK_NAME}-https.tls=true
-        - traefik.http.services.${STACK_NAME}.loadbalancer.server.port=80
-    environment:
-      - API_URL=http://backend:5000
 
   database:
-    image: registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/database:${DOCKER_TAG}
-    networks:
-      - app-network
+    image: mcr.microsoft.com/mssql/server:2022-latest
     deploy:
-      mode: replicated
       replicas: 1
+      restart_policy:
+        condition: on-failure
     environment:
-      - ACCEPT_EULA=YES
-      - MSSQL_SA_PASSWORD=${DB_PASSWORD}
-      - MSSQL_PID=Developer
+      SA_PASSWORD: ${DB_PASSWORD}
+      ACCEPT_EULA: "Y"
+      MSSQL_PID: "Developer"
+    ports:
+      - "1433:1433"
     volumes:
       - db_data:/var/opt/mssql
+    networks:
+      - app-network
 
-networks:
-  traefik-public:
-    external: true
-  app-network:
-    driver: bridge
+  frontend:
+    image: registry.example.com/plan-it/frontend:${DOCKER_TAG}
+    deploy:
+      replicas: 2
+      restart_policy:
+        condition: on-failure
+      update_config:
+        parallelism: 1
+        delay: 5s
+    ports:
+      - "3000:80"
+    environment:
+      API_URL: http://backend:5000
+    networks:
+      - app-network
+    depends_on:
+      - backend
+
+  adminer:
+    image: adminer:latest
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+    ports:
+      - "8080:8080"
+    depends_on:
+      - database
+    environment:
+      ADMINER_DEFAULT_SERVER: database
+    networks:
+      - app-network
 
 volumes:
   db_data:
- 
+
+networks:
+  app-network:
+    driver: overlay
