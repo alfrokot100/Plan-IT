@@ -21,7 +21,7 @@ build-backend:
   stage: build
   image: docker:latest
   script:
-    - docker build -t registry.example.com/plan-it/backend:${DOCKER_TAG} ./backend
+    - docker build -f ./backend/Dockerfile -t registry.example.com/plan-it/backend:${DOCKER_TAG} ./backend
     - docker push registry.example.com/plan-it/backend:${DOCKER_TAG}
 
 # Build database image
