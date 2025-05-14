@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    image: registry.example.com/plan-it/backend:${DOCKER_TAG}
+    image: registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/backend:${DOCKER_TAG}
     deploy:
       replicas: 2
       restart_policy:
@@ -39,7 +39,7 @@ services:
       - app-network
 
   frontend:
-    image: registry.example.com/plan-it/frontend:${DOCKER_TAG}
+    image: registry./chas-challenge-2025/group-13/plan-it/frontend:${DOCKER_TAG}
     deploy:
       replicas: 2
       restart_policy:
@@ -50,7 +50,7 @@ services:
     ports:
       - "3000:80"
     environment:
-      API_URL: http://backend:5000
+      API_URL: API_URL=http://plan-it-backend:80
     networks:
       - app-network
     depends_on:
