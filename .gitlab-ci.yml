@@ -21,24 +21,24 @@ build-backend:
   stage: build
   image: docker:latest
   script:
-    - docker build -f ./backend/dockerfile-backend -t registry.example.com/plan-it/backend:${DOCKER_TAG} ./backend
-    - docker push registry.example.com/plan-it/backend:${DOCKER_TAG}
+    - docker build -f ./backend/dockerfile-backend -t registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/backend:${DOCKER_TAG} ./backend
+    - docker push /plan-it/backend:${DOCKER_TAG}
 
 # Build database image
 build-database:
   stage: build
   image: docker:latest
   script:
-    - docker build -f ./backend/dockerfile-sql -t registry.example.com/plan-it/database:${DOCKER_TAG} ./database
-    - docker push registry.example.com/plan-it/database:${DOCKER_TAG}
+    - docker build -f ./backend/dockerfile-sql -t registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/database:${DOCKER_TAG} ./database
+    - docker push registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/database:${DOCKER_TAG}
 
 # Build frontend image
 build-frontend:
   stage: build
   image: docker:latest
   script:
-    - docker build -f dockerfile-react -t registry.example.com/plan-it/frontend:${DOCKER_TAG} ./frontend
-    - docker push registry.example.com/plan-it/frontend:${DOCKER_TAG}
+    - docker build -f dockerfile-react -t registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/frontend:${DOCKER_TAG} ./frontend
+    - docker push registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/frontend:${DOCKER_TAG}
 
 # Deploy stage
 deploy:
@@ -48,7 +48,7 @@ deploy:
     - docker stack deploy --compose-file docker-compose.yml plan-it
   environment:
     name: production/$CI_COMMIT_REF_NAME
-    url: https://$CI_PROJECT_NAME.$CI_ENVIRONMENT_SLUG.example.dev
+    url: https://g13-$CI_COMMIT_REF_SLUG.cc25.chasacademy.dev
   only:
     - main
 
