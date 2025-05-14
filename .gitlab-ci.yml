@@ -21,7 +21,7 @@ build-backend:
   stage: build
   image: docker:latest
   script:
-    - docker build -f ./backend/Dockerfile -t registry.example.com/plan-it/backend:${DOCKER_TAG} ./backend
+    - docker build -f ./backend/dockerfile-backend -t registry.example.com/plan-it/backend:${DOCKER_TAG} ./backend
     - docker push registry.example.com/plan-it/backend:${DOCKER_TAG}
 
 # Build database image
@@ -29,7 +29,7 @@ build-database:
   stage: build
   image: docker:latest
   script:
-    - docker build -t registry.example.com/plan-it/database:${DOCKER_TAG} ./database
+    - docker build -f ./backend/dockerfile-sql -t registry.example.com/plan-it/database:${DOCKER_TAG} ./database
     - docker push registry.example.com/plan-it/database:${DOCKER_TAG}
 
 # Build frontend image
@@ -37,7 +37,7 @@ build-frontend:
   stage: build
   image: docker:latest
   script:
-    - docker build -t registry.example.com/plan-it/frontend:${DOCKER_TAG} ./frontend
+    - docker build -f dockerfile-react -t registry.example.com/plan-it/frontend:${DOCKER_TAG} ./frontend
     - docker push registry.example.com/plan-it/frontend:${DOCKER_TAG}
 
 # Deploy stage
