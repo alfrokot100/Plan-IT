@@ -2,15 +2,21 @@ stages:
   - restore
   - build
   - test
+  - deploy
 
 variables:
   DOTNET_CLI_TELEMETRY_OPTOUT: "1"
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1"
+  IMAGE_NAME: chitrabala/dotnet-api       # Replace with your actual Docker Hub image name
+  TAG: $CI_COMMIT_SHORT_SHA
+  PORTAINER_URL: https://portainer.doe24-2.swarm.chasacademy.dev/ # Replace with your Portainer instance URL
+  STACK_NAME: planit-app
+  ENDPOINT_ID: 2                           # Replace with your Portainer environment ID
 
 # Restore NuGet packages
 restore:
   stage: restore
-  image: mcr.microsoft.com/dotnet/sdk:8.0 # Use the appropriate .NET SDK version
+  image: mcr.microsoft.com/dotnet/sdk:8.0
   script:
     - cd backend
     - dotnet restore
@@ -22,7 +28,7 @@ restore:
 # Build the project
 build:
   stage: build
-  image: mcr.microsoft.com/dotnet/sdk:8.0 # Use the appropriate .NET SDK version
+  image: mcr.microsoft.com/dotnet/sdk:8.0
   script:
     - cd backend
     - dotnet build --configuration Release
@@ -35,7 +41,7 @@ build:
 # Run tests
 test:
   stage: test
-  image: mcr.microsoft.com/dotnet/sdk:8.0 # Use the appropriate .NET SDK version
+  image: mcr.microsoft.com/dotnet/sdk:8.0
   script:
     - cd backend
     - dotnet test --logger:trx
@@ -43,3 +49,42 @@ test:
     paths:
       - backend/TestResults/
     when: always
+
+# Deploy to Portainer using Portainer API
+deploy:
+  stage: deploy
+  image: docker:latest
+  services:
+    - docker:dind
+  before_script:
+    - apk add --no-cache curl jq
+  script:
+    # Login to Docker Hub
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
+    # Build and push Docker image
+    - docker build -t $IMAGE_NAME:$TAG .
+    - docker push $IMAGE_NAME:$TAG
+
+    # Authenticate to Portainer API
+    - >
+      JWT=$(curl -s -X POST "$PORTAINER_URL/api/auth"
+        -H "Content-Type: application/json"
+        -d "{\"Username\": \"$PORTAINER_USER\", \"Password\": \"$PORTAINER_PASSWORD\"}" |
+        jq -r .jwt)
+
+    # Update stack with correct JSON structure
+    - |
+      curl -s -X PUT "$PORTAINER_URL/api/stacks/$STACK_NAME?endpointId=$ENDPOINT_ID" \
+        -H "Authorization: Bearer $JWT" \
+        -H "Content-Type: application/json" \
+        -d "$(jq -n \
+            --arg name "$STACK_NAME" \
+            --arg image "$IMAGE_NAME:$TAG" \
+            '{
+              Name: $name,
+              StackFileContent: "version: \"3\"\nservices:\n  app:\n    image: " + $image + "\n    ports:\n      - \"80:80\"",
+              Prune: true
+            }')"
+  only:
+    - main
