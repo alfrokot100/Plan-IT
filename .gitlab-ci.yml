@@ -12,10 +12,11 @@ restore:
   stage: restore
   image: mcr.microsoft.com/dotnet/sdk:7.0 # Use the appropriate .NET SDK version
   script:
+    - cd backend
     - dotnet restore
   artifacts:
     paths:
-      - .nuget/packages/
+      - backend/.nuget/packages/
     expire_in: 1 week
 
 # Build the project
@@ -23,11 +24,12 @@ build:
   stage: build
   image: mcr.microsoft.com/dotnet/sdk:7.0 # Use the appropriate .NET SDK version
   script:
+    - cd backend
     - dotnet build --configuration Release
   artifacts:
     paths:
-      - bin/
-      - obj/
+      - backend/bin/
+      - backend/obj/
     expire_in: 1 week
 
 # Run tests
@@ -35,8 +37,9 @@ test:
   stage: test
   image: mcr.microsoft.com/dotnet/sdk:7.0 # Use the appropriate .NET SDK version
   script:
+    - cd backend
     - dotnet test --logger:trx
   artifacts:
     paths:
-      - TestResults/
+      - backend/TestResults/
     when: always
