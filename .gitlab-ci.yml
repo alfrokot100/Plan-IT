@@ -1,61 +1,42 @@
 stages:
-  - pre-build
+  - restore
   - build
   - test
-  - deploy
-  - teardown
 
 variables:
-  DOCKER_TAG: $CI_COMMIT_REF_SLUG
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1"
 
-# Pre-build stage
-build-builder:
-  stage: pre-build
-  image: docker:latest
+# Restore NuGet packages
+restore:
+  stage: restore
+  image: mcr.microsoft.com/dotnet/sdk:7.0 # Use the appropriate .NET SDK version
   script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
-    - echo "Preparing builder..."
+    - dotnet restore
+  artifacts:
+    paths:
+      - .nuget/packages/
+    expire_in: 1 week
 
-# Build backend image
-build-backend:
+# Build the project
+build:
   stage: build
-  image: docker:latest
+  image: mcr.microsoft.com/dotnet/sdk:7.0 # Use the appropriate .NET SDK version
   script:
-    - docker build -f ./backend/dockerfile-backend -t registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/backend:${DOCKER_TAG} ./backend
-    - docker push /plan-it/backend:${DOCKER_TAG}
+    - dotnet build --configuration Release
+  artifacts:
+    paths:
+      - bin/
+      - obj/
+    expire_in: 1 week
 
-# Build database image
-build-database:
-  stage: build
-  image: docker:latest
+# Run tests
+test:
+  stage: test
+  image: mcr.microsoft.com/dotnet/sdk:7.0 # Use the appropriate .NET SDK version
   script:
-    - docker build -f ./backend/dockerfile-sql -t registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/database:${DOCKER_TAG} ./database
-    - docker push registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/database:${DOCKER_TAG}
-
-# Build frontend image
-build-frontend:
-  stage: build
-  image: docker:latest
-  script:
-    - docker build -f dockerfile-react -t registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/frontend:${DOCKER_TAG} ./frontend
-    - docker push registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/frontend:${DOCKER_TAG}
-
-# Deploy stage
-deploy:
-  stage: deploy
-  image: docker:latest
-  script:
-    - docker stack deploy --compose-file docker-compose.yml plan-it
-  environment:
-    name: production/$CI_COMMIT_REF_NAME
-    url: https://g13-$CI_COMMIT_REF_SLUG.cc25.chasacademy.dev
-  only:
-    - main
-
-# Teardown stage
-teardown:
-  stage: teardown
-  image: docker:latest
-  script:
-    - docker stack rm plan-it
-  when: manual
+    - dotnet test --logger:trx
+  artifacts:
+    paths:
+      - TestResults/
+    when: always
