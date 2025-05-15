@@ -10,7 +10,7 @@ variables:
 # Restore NuGet packages
 restore:
   stage: restore
-  image: mcr.microsoft.com/dotnet/sdk:7.0 # Use the appropriate .NET SDK version
+  image: mcr.microsoft.com/dotnet/sdk:8.0 # Use the appropriate .NET SDK version
   script:
     - cd backend
     - dotnet restore
@@ -22,7 +22,7 @@ restore:
 # Build the project
 build:
   stage: build
-  image: mcr.microsoft.com/dotnet/sdk:7.0 # Use the appropriate .NET SDK version
+  image: mcr.microsoft.com/dotnet/sdk:8.0 # Use the appropriate .NET SDK version
   script:
     - cd backend
     - dotnet build --configuration Release
@@ -35,7 +35,7 @@ build:
 # Run tests
 test:
   stage: test
-  image: mcr.microsoft.com/dotnet/sdk:7.0 # Use the appropriate .NET SDK version
+  image: mcr.microsoft.com/dotnet/sdk:8.0 # Use the appropriate .NET SDK version
   script:
     - cd backend
     - dotnet test --logger:trx
