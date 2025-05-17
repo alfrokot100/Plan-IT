@@ -43,6 +43,14 @@ dockerize:
     # Build local Docker image (no push)
       - docker build -t my-dotnet-app:latest -f pipeline-utilities/Dockerfile .
 
+
+check-portainer-connection:
+  stage: check
+  image: curlimages/curl:latest
+  script:
+    - echo "Checking connection to Portainer at $PORTAINER_URL/api/status"
+    - curl -sk --connect-timeout 10 --max-time 20 "$PORTAINER_URL/api/status"
+
 deploy:
   stage: deploy
   image: alpine:latest
