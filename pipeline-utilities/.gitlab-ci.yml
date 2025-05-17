@@ -1,0 +1,85 @@
+stages:
+  - restore
+  - build
+  - test
+  - dockerize
+  - deploy
+
+variables:
+  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1"
+
+restore:
+  stage: restore
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+  script:
+    - cd backend
+    - dotnet restore
+
+build:
+  stage: build
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+  script:
+    - cd backend
+    - dotnet build --configuration Release
+
+test:
+  stage: test
+  image: mcr.microsoft.com/dotnet/sdk:8.0
+  script:
+    - cd backend
+    - dotnet test --logger:trx
+  artifacts:
+    paths:
+      - backend/TestResults/
+    when: always
+
+dockerize:
+  stage: dockerize
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    # Build local Docker image (no push)
+      - docker build -t my-dotnet-app:latest -f pipeline-utilities/Dockerfile .
+
+deploy:
+  stage: deploy
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache curl jq
+  script:
+    # Authenticate to Portainer API and get JWT token
+    - >
+      JWT=$(curl -s -X POST "$PORTAINER_URL/api/auth" -H "Content-Type: application/json"
+      -d "{\"Username\":\"$PORTAINER_USER\",\"Password\":\"$PORTAINER_PASSWORD\"}" | jq -r .jwt)
+    # Find existing stack ID (if exists)
+    - >
+      STACK_ID=$(curl -s -H "Authorization: Bearer $JWT" "$PORTAINER_URL/api/stacks" |
+      jq -r --arg name "$STACK_NAME" '.[] | select(.Name==$name) | .Id')
+    # Create docker-compose stack file dynamically, using local image
+    - |
+      cat <<EOF > stack.yml
+      version: "3.8"
+      services:
+        backend:
+          image: my-dotnet-app:latest
+          ports:
+            - "8080:80"
+          deploy:
+            replicas: 1
+      EOF
+    # Update existing stack or create a new one
+    - >
+      if [ -n "$STACK_ID" ]; then
+        curl -s -X PUT "$PORTAINER_URL/api/stacks/$STACK_ID?endpointId=$ENDPOINT_ID" \
+        -H "Authorization: Bearer $JWT" -H "Content-Type: application/json" \
+        --data "$(jq -n --arg fileContent "$(cat stack.yml)" '{ StackFileContent: $fileContent, Prune: true }')"
+      else
+        curl -s -X POST "$PORTAINER_URL/api/stacks?type=1&method=string&endpointId=$ENDPOINT_ID" \
+        -H "Authorization: Bearer $JWT" \
+        -F "Name=$STACK_NAME" \
+        -F "StackFileContent=<stack.yml"
+      fi
+  only:
+    - main
