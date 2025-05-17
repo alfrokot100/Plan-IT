@@ -59,9 +59,15 @@ deploy:
     - apk add --no-cache curl jq
   script:
   - >
-    JWT=$(curl -sk -X POST "$PORTAINER_URL/api/auth"
-    -H "Content-Type: application/json"
-    -d "{\"Username\":\"$PORTAINER_USER\",\"Password\":\"$PORTAINER_PASSWORD\"}" | jq -r .jwt)
+    RESPONSE=$(curl -sk -X POST "$PORTAINER_URL/api/auth" \
+     -H "Content-Type: application/json" \
+      -d "{\"Username\":\"$PORTAINER_USER\",\"Password\":\"$PORTAINER_PASSWORD\"}")
+
+    echo "Raw response from Portainer auth API:"
+    echo "$RESPONSE"
+
+    JWT=$(echo "$RESPONSE" | jq -r .jwt)
+
 
 
     # Find existing stack ID (if exists)
