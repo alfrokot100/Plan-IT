@@ -58,6 +58,7 @@ deploy:
   before_script:
     - apk add --no-cache curl jq
   script:
+    - set -x
     - echo "Authenticating with Portainer..."
     - >
       RESPONSE=$(curl -sk -X POST "$PORTAINER_URL/api/auth" \
@@ -65,22 +66,18 @@ deploy:
         -d "{\"Username\":\"$PORTAINER_USER\",\"Password\":\"$PORTAINER_PW\"}")
     - echo "Raw response from Portainer:"
     - echo "$RESPONSE"
-    # Check if authentication failed
     - |
       if echo "$RESPONSE" | jq -e '.message' >/dev/null; then
-        echo "Portainer auth error: $(echo $RESPONSE | jq -r '.message')"
+        echo "Portainer auth error: $(echo "$RESPONSE" | jq -r '.message')"
         exit 1
       fi
     - JWT=$(echo "$RESPONSE" | jq -r .jwt)
-    
     - echo "Checking for existing stack..."
     - >
       STACK_ID=$(curl -s -H "Authorization: Bearer $JWT" "$PORTAINER_URL/api/stacks" |
       jq -r --arg name "$STACK_NAME" '.[] | select(.Name==$name) | .Id')
       - echo "Existing stack ID: $STACK_ID"
-    
-    - echo "Generating stack.yml..."
-    - |
+      - |
       cat <<EOF > stack.yml
       version: "3.8"
       services:
@@ -91,8 +88,6 @@ deploy:
           deploy:
             replicas: 1
       EOF
-
-    # If stack exists, update it; otherwise create new stack
     - |
       if [ -n "$STACK_ID" ]; then
         echo "Updating existing stack: $STACK_NAME"
@@ -102,7 +97,7 @@ deploy:
           --data "$(jq -n --arg fileContent "$(cat stack.yml)" '{StackFileContent: $fileContent, Prune: true }')")
         echo "Update response: $UPDATE_RESPONSE"
         if echo "$UPDATE_RESPONSE" | jq -e '.message' >/dev/null; then
-          echo "Error updating stack: $(echo $UPDATE_RESPONSE | jq -r '.message')"
+          echo "Error updating stack: $(echo "$UPDATE_RESPONSE" | jq -r '.message')"
           exit 1
         fi
       else
@@ -113,13 +108,11 @@ deploy:
           -F "StackFileContent=<stack.yml")
         echo "Create response: $CREATE_RESPONSE"
         if echo "$CREATE_RESPONSE" | jq -e '.message' >/dev/null; then
-          echo "Error creating stack: $(echo $CREATE_RESPONSE | jq -r '.message')"
+          echo "Error creating stack: $(echo "$CREATE_RESPONSE" | jq -r '.message')"
           exit 1
         fi
       fi
-
     - echo "Deploy finished."
-
   only:
     - main
 
