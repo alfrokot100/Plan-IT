@@ -61,7 +61,7 @@ deploy:
   - >
     RESPONSE=$(curl -sk -X POST "$PORTAINER_URL/api/auth" \
      -H "Content-Type: application/json" \
-      -d "{\"Username\":\"$PORTAINER_USER\",\"Password\":\"$PORTAINER_PASSWORD\"}")
+      -d "{\"Username\":\"$PORTAINER_USER\",\"Password\":\"$PORTAINER_PW\"}")
 
     echo "Raw response from Portainer auth API:"
     echo "$RESPONSE"
