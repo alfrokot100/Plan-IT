@@ -76,8 +76,7 @@ deploy:
     - >
       STACK_ID=$(curl -s -H "Authorization: Bearer $JWT" "$PORTAINER_URL/api/stacks" |
       jq -r --arg name "$STACK_NAME" '.[] | select(.Name==$name) | .Id')
-      - echo "Existing stack ID: $STACK_ID"
-      - |
+    - |
       cat <<EOF > stack.yml
       version: "3.8"
       services:
