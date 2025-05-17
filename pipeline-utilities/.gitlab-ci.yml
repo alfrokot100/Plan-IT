@@ -49,10 +49,12 @@ deploy:
   before_script:
     - apk add --no-cache curl jq
   script:
-    # Authenticate to Portainer API and get JWT token
-    - >
-      JWT=$(curl -s -X POST "$PORTAINER_URL/api/auth" -H "Content-Type: application/json"
-      -d "{\"Username\":\"$PORTAINER_USER\",\"Password\":\"$PORTAINER_PASSWORD\"}" | jq -r .jwt)
+  - >
+    JWT=$(curl -sk -X POST "$PORTAINER_URL/api/auth"
+    -H "Content-Type: application/json"
+    -d "{\"Username\":\"$PORTAINER_USER\",\"Password\":\"$PORTAINER_PASSWORD\"}" | jq -r .jwt)
+
+
     # Find existing stack ID (if exists)
     - >
       STACK_ID=$(curl -s -H "Authorization: Bearer $JWT" "$PORTAINER_URL/api/stacks" |
