@@ -4,6 +4,7 @@ using TeamApp.Data;
 using TeamApp.Endpoints.TeamEndpoints;
 using TeamApp.Services;
 using TeamApp.Endpoints.TaskEndpoints;
+using TeamApp.Endpoints.CommenEndpoints;
 
 namespace TeamApp
 {
@@ -28,6 +29,8 @@ namespace TeamApp
             builder.Services.AddScoped<UserService>();
 
             builder.Services.AddScoped<TaskService>();
+           
+            builder.Services.AddScoped<CommentService>();
 
             builder.Services.AddCors(options =>
             {
@@ -56,8 +59,9 @@ namespace TeamApp
             app.UseCors("MyReactApp");
             app.UseAuthorization();
 
-            TeamEndpoints.RegisterEndpoints(app);
+            UserEndpoints.RegisterEndpoints(app);
             TaskEndpoints.RegisterEndpoints(app);
+            CommentEndpoints.MessageEndpoints(app);
 
             app.Run();
         }

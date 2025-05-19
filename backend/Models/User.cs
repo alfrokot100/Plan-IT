@@ -17,13 +17,17 @@ namespace TeamApp.Models
         public string Username { get; set; }
 
         [StringLength(50, MinimumLength = 5)]
-        public string Password { get; set; }//Lösenord bör inte lagras i text
+        public string PasswordHash { get; set; }//Lösenord bör inte lagras i text
 
         [EmailAddress]
         public string Email { get; set; }
 
         [StringLength(50, MinimumLength = 3)]
         public string Role { get; set; }
+
+        [Required]
+        [StringLength(500)]
+        public string Description { get; set; } // Ny property
 
         // Relationer till andra entiteter
         //För att skapa 1 -> M relationer
