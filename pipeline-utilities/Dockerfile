@@ -23,4 +23,4 @@ COPY --from=build /app/out ./
 EXPOSE 80
 
 # Run the app
-ENTRYPOINT ["dotnet", "YourAppName.dll"]
+ENTRYPOINT ["dotnet", "plan-it.dll"]
