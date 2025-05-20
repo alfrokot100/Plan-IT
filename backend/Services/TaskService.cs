@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using TeamApp.DTOs.CommentDTO;
-using TeamApp.DTOs.GoalDTO;
+using TeamApp.DTOs.ProjectDTO;
 using TeamApp.DTOs.TaskDTO;
 using TeamApp.DTOs.TeamDTO;
 using TeamApp.DTOs.UserDTO;

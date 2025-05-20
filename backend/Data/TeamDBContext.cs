@@ -35,7 +35,7 @@ namespace TeamApp.Data
 
         //Agerar som en bro mot tabellen i databasen
         public DbSet<User> Users { get; set; }
-        public DbSet<Goal> Goals { get; set; }
+        public DbSet<Project> Projects { get; set; }
         public DbSet<LogEntry> LogEntrys { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<Task> Tasks { get; set; }

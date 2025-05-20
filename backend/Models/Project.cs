@@ -3,10 +3,10 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TeamApp.Models
 {
-    public class Goal
+    public class Project
     {
         [Key]
-        public int GoalID { get; set; }
+        public int ProjectID { get; set; }
 
         [ForeignKey("User")]
         public int UserID_FK { get; set; }
@@ -18,7 +18,6 @@ namespace TeamApp.Models
         [Required]
         public DateTime? Deadline { get; set; }
         public int? Status { get; set; }
-        public string Priority { get; set; }
 
         [StringLength(50, MinimumLength = 8)]
         public string Title { get; set; }

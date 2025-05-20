@@ -1,8 +1,8 @@
-﻿namespace TeamApp.DTOs.GoalDTO
+﻿namespace TeamApp.DTOs.ProjectDTO
 {
-    public class GoalTDO
+    public class ProjectDTO
     {
-        public int GoalID { get; set; }
+        public int ProjectID { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public DateTime? Deadline { get; set; }
