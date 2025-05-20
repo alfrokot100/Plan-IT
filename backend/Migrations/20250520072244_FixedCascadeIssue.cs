@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace TeamApp.Migrations
 {
     /// <inheritdoc />
-    public partial class InitNewDB : Migration
+    public partial class FixedCascadeIssue : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,9 +33,10 @@ namespace TeamApp.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     TeamID_FK = table.Column<int>(type: "int", nullable: true),
                     Username = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Password = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    PasswordHash = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Role = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false)
+                    Role = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -122,10 +123,10 @@ namespace TeamApp.Migrations
                 {
                     TaskID = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    GoalID_FK = table.Column<int>(type: "int", nullable: true),
-                    UserID_FK = table.Column<int>(type: "int", nullable: false),
+                    GoalID_FK = table.Column<int>(type: "int", nullable: false),
                     Title = table.Column<string>(type: "nvarchar(25)", maxLength: 25, nullable: false),
-                    IsDone = table.Column<bool>(type: "bit", nullable: false),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     DueDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
@@ -135,12 +136,7 @@ namespace TeamApp.Migrations
                         name: "FK_Tasks_Goals_GoalID_FK",
                         column: x => x.GoalID_FK,
                         principalTable: "Goals",
-                        principalColumn: "GoalID");
-                    table.ForeignKey(
-                        name: "FK_Tasks_Users_UserID_FK",
-                        column: x => x.UserID_FK,
-                        principalTable: "Users",
-                        principalColumn: "UserID",
+                        principalColumn: "GoalID",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -172,6 +168,31 @@ namespace TeamApp.Migrations
                     table.ForeignKey(
                         name: "FK_Comments_Users_UserID_FK",
                         column: x => x.UserID_FK,
+                        principalTable: "Users",
+                        principalColumn: "UserID",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserTasks",
+                columns: table => new
+                {
+                    userTaskID = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    userID_FK = table.Column<int>(type: "int", nullable: false),
+                    taskID_FK = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserTasks", x => x.userTaskID);
+                    table.ForeignKey(
+                        name: "FK_UserTasks_Tasks_taskID_FK",
+                        column: x => x.taskID_FK,
+                        principalTable: "Tasks",
+                        principalColumn: "TaskID");
+                    table.ForeignKey(
+                        name: "FK_UserTasks_Users_userID_FK",
+                        column: x => x.userID_FK,
                         principalTable: "Users",
                         principalColumn: "UserID",
                         onDelete: ReferentialAction.Cascade);
@@ -213,14 +234,19 @@ namespace TeamApp.Migrations
                 column: "GoalID_FK");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tasks_UserID_FK",
-                table: "Tasks",
-                column: "UserID_FK");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Users_TeamID_FK",
                 table: "Users",
                 column: "TeamID_FK");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserTasks_taskID_FK",
+                table: "UserTasks",
+                column: "taskID_FK");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserTasks_userID_FK",
+                table: "UserTasks",
+                column: "userID_FK");
         }
 
         /// <inheritdoc />
@@ -234,6 +260,9 @@ namespace TeamApp.Migrations
 
             migrationBuilder.DropTable(
                 name: "Notifications");
+
+            migrationBuilder.DropTable(
+                name: "UserTasks");
 
             migrationBuilder.DropTable(
                 name: "Tasks");
