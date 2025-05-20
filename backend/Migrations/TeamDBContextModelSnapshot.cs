@@ -165,28 +165,27 @@ namespace TeamApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("TaskID"));
 
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("GoalID_FK")
+                    b.Property<int>("GoalID_FK")
                         .HasColumnType("int");
 
-                    b.Property<bool>("IsDone")
-                        .HasColumnType("bit");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(25)
                         .HasColumnType("nvarchar(25)");
 
-                    b.Property<int>("UserID_FK")
-                        .HasColumnType("int");
-
                     b.HasKey("TaskID");
 
                     b.HasIndex("GoalID_FK");
-
-                    b.HasIndex("UserID_FK");
 
                     b.ToTable("Tasks");
                 });
@@ -222,11 +221,16 @@ namespace TeamApp.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserID"));
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Password")
+                    b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
@@ -249,6 +253,29 @@ namespace TeamApp.Migrations
                     b.HasIndex("TeamID_FK");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("TeamApp.Models.UserTask", b =>
+                {
+                    b.Property<int>("userTaskID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("userTaskID"));
+
+                    b.Property<int>("taskID_FK")
+                        .HasColumnType("int");
+
+                    b.Property<int>("userID_FK")
+                        .HasColumnType("int");
+
+                    b.HasKey("userTaskID");
+
+                    b.HasIndex("taskID_FK");
+
+                    b.HasIndex("userID_FK");
+
+                    b.ToTable("UserTasks");
                 });
 
             modelBuilder.Entity("TeamApp.Models.Comment", b =>
@@ -311,17 +338,11 @@ namespace TeamApp.Migrations
                 {
                     b.HasOne("TeamApp.Models.Goal", "Goal")
                         .WithMany("Tasks")
-                        .HasForeignKey("GoalID_FK");
-
-                    b.HasOne("TeamApp.Models.User", "User")
-                        .WithMany("Tasks")
-                        .HasForeignKey("UserID_FK")
+                        .HasForeignKey("GoalID_FK")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Goal");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("TeamApp.Models.User", b =>
@@ -333,6 +354,25 @@ namespace TeamApp.Migrations
                     b.Navigation("Team");
                 });
 
+            modelBuilder.Entity("TeamApp.Models.UserTask", b =>
+                {
+                    b.HasOne("TeamApp.Models.Task", "task")
+                        .WithMany("UserTasks")
+                        .HasForeignKey("taskID_FK")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("TeamApp.Models.User", "user")
+                        .WithMany("UserTasks")
+                        .HasForeignKey("userID_FK")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("task");
+
+                    b.Navigation("user");
+                });
+
             modelBuilder.Entity("TeamApp.Models.Goal", b =>
                 {
                     b.Navigation("Tasks");
@@ -341,6 +381,8 @@ namespace TeamApp.Migrations
             modelBuilder.Entity("TeamApp.Models.Task", b =>
                 {
                     b.Navigation("Comments");
+
+                    b.Navigation("UserTasks");
                 });
 
             modelBuilder.Entity("TeamApp.Models.Team", b =>
@@ -358,7 +400,7 @@ namespace TeamApp.Migrations
 
                     b.Navigation("Notifications");
 
-                    b.Navigation("Tasks");
+                    b.Navigation("UserTasks");
                 });
 #pragma warning restore 612, 618
         }

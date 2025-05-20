@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using TeamApp.Data;
 using TeamApp.DTOs.CommentDTO;
@@ -15,11 +16,14 @@ namespace TeamApp.Services
     public class UserService
     {
         private readonly TeamDBContext context;
+        private readonly ILogger<UserService> logger;
+
 
         //Dependancy injection
-        public UserService(TeamDBContext _context)
+        public UserService(TeamDBContext _context, ILogger<UserService> _logger)
         {
             context = _context;
+            logger = _logger;
         }
 
         public async Task<List<GoalTDO>> GetAllGoals()
@@ -100,7 +104,8 @@ namespace TeamApp.Services
                 Email = newUser.Email,
                 Username = newUser.Username,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(newUser.Password), // Hashing här
-                Role = newUser.Role ?? "User"
+                Role = newUser.Role ?? "User",
+                Description = newUser.Description
             };
 
             context.Users.Add(user);
@@ -145,14 +150,24 @@ namespace TeamApp.Services
             return true;
 
         }
+        
         //Metod för säker inloggning
         public async Task<User?> Authenticate(string email, string password)
         {
             var user = await context.Users.FirstOrDefaultAsync(u => u.Email == email);
-            if (user == null) return null;
+            if (user == null)
+            {
+                logger.LogWarning($"Inloggningsförsök med okänd e-post: {email}");
+                return null;
+            }
 
-            // Verifiera lösenord
-            return BCrypt.Net.BCrypt.Verify(password, user.PasswordHash) ? user : null;
+            if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            {
+                logger.LogWarning($"Felaktigt lösenord för användare: {user.Email}");
+                return null;
+            }
+
+            return user;
         }
 
         /*----------------------------------------------------------------------------------------------- */

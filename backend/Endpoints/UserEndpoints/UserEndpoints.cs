@@ -57,6 +57,20 @@ namespace TeamApp.Endpoints.TeamEndpoints
                 return Results.Ok(result);
             });
 
+            app.MapPost("/users/login", async (UserService userService, LoginRequest request) =>
+            {
+                if(string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password)) 
+                {
+                    return Results.BadRequest("E-post och lösenord krävs");
+                }
+
+                var user = await userService.Authenticate(request.Email, request.Password);
+
+                if(user == null) { return Results.Unauthorized(); }
+
+                return Results.Ok(new {user.UserID, user.Role });
+            });
+
         }
     }
 }
