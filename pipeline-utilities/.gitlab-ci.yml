@@ -79,8 +79,7 @@ deploy:
     - JWT=$(echo "$RESPONSE" | jq -r .jwt)
     - echo "Checking for existing stack..."
     - >
-      STACK_ID=$(curl -s -H "Authorization: Bearer $JWT" "$PORTAINER_URL/api/stacks" |
-      jq -r --arg name "$STACK_NAME"
+      STACK_ID=$(curl -s -H "Authorization: Bearer $JWT" "$PORTAINER_URL/api/stacks" | jq -r --arg name "$STACK_NAME" '.[] | select(.Name==$name) | .Id')
 
 
 
