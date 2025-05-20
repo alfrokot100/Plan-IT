@@ -5,6 +5,7 @@ using TeamApp.Endpoints.TeamEndpoints;
 using TeamApp.Services;
 using TeamApp.Endpoints.TaskEndpoints;
 using TeamApp.Endpoints.CommenEndpoints;
+using TeamApp.Endpoints.ProjectEndpoints;
 
 namespace TeamApp
 {
@@ -31,6 +32,8 @@ namespace TeamApp
             builder.Services.AddScoped<TaskService>();
            
             builder.Services.AddScoped<CommentService>();
+
+            builder.Services.AddScoped<ProjectService>();
 
             builder.Services.AddCors(options =>
             {
@@ -62,6 +65,7 @@ namespace TeamApp
             UserEndpoints.RegisterEndpoints(app);
             TaskEndpoints.RegisterEndpoints(app);
             CommentEndpoints.MessageEndpoints(app);
+            ProjectEndpoints.RegisterEndpoints(app);
 
             app.Run();
         }

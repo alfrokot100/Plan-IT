@@ -1,14 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace TeamApp.DTOs.GoalDTO
+namespace TeamApp.DTOs.ProjectDTO
 {
-    public class UpdateGoalDTO
+    public class UpdateProjectDTO
     {
         [Required]
         public int UserID { get; set; }
 
         [Required]
-        public int GoalID { get; set; }
+        public int ProjectID { get; set; }
 
         [Required]
         public string Title { get; set; }

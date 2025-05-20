@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using TeamApp.Data;
 using TeamApp.DTOs.CommentDTO;
-using TeamApp.DTOs.GoalDTO;
+using TeamApp.DTOs.ProjectDTO;
 using TeamApp.DTOs.TaskDTO;
 using TeamApp.DTOs.TeamDTO;
 using TeamApp.DTOs.UserDTO;
@@ -26,16 +26,16 @@ namespace TeamApp.Services
             logger = _logger;
         }
 
-        public async Task<List<GoalTDO>> GetAllGoals()
+        public async Task<List<ProjectDTO>> GetAllProjects()
         {
-            var goalList = await context.Goals.Select(g => new GoalTDO
+            var projectList = await context.Projects.Select(g => new ProjectDTO
             {
-                GoalID = g.GoalID,
+                ProjectID = g.ProjectID,
                 Title = g.Title,
                 Description = g.Description,
                 Deadline = g.Deadline
             }).ToListAsync();
-            return goalList;
+            return projectList;
         }
 
         public async Task<List<TaskDTO>> GetAllTasks()

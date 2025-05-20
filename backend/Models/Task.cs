@@ -12,7 +12,7 @@ namespace TeamApp.Models
 
         [ForeignKey("Goal")]
         public int GoalID_FK { get; set; }
-        public virtual Goal Goal { get; set; }
+        public virtual Project Goal { get; set; }
 
         [Required]
         [StringLength(25, MinimumLength = 5)]
