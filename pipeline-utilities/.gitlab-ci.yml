@@ -64,7 +64,6 @@ deploy:
     # Authenticate with Portainer
     - |
       export PORTAINER_TOKEN=$(curl -X POST "https://portainer.doe24-2.swarm.chasacademy.dev/api/auth" --json '{"username": "'$PORTAINER_USER'", "password": "'$PORTAINER_PASSWORD'"}'| jq -r '.jwt')
-
       RESPONSE=$(curl -sk -X POST "$PORTAINER_URL/api/auth" \
         -H "Content-Type: application/json" \
         -d "{\"username\":\"$PORTAINER_USER\",\"password\":\"$PORTAINER_PW\"}")
