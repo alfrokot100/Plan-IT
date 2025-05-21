@@ -5,5 +5,7 @@ services:
     ports:
       - "8080:80"
     deploy:
-      replicas: 1
+      replicas: 1 
+       environment:
+      ASPNETCORE_ENVIRONMENT: "Production"
 
