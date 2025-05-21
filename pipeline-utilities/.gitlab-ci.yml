@@ -5,7 +5,7 @@ stages:
   - dockerize
   - check
   - deploy
-
+   -teardown
 variables:
   DOTNET_CLI_TELEMETRY_OPTOUT: "1"
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1"
@@ -55,10 +55,9 @@ check-portainer-connection:
 
 deploy:
   stage: deploy
-  image: python:3.10-alpine    # Use python image if you need python scripts, or use alpine if not
+  image: python:3.10-alpine    
   before_script:
-    - apk add --no-cache bash curl jq  # Make sure bash, curl, jq are available
-    # (Optional) pip install -r requirements.txt  # If you need Python dependencies
+    - apk add --no-cache bash curl jq  
   environment:
     name: production
     url: https://g13-$CI_COMMIT_REF_SLUG.cc25.chasacademy.dev
@@ -102,7 +101,15 @@ deploy:
       echo "Deploy finished."
   rules:
     - if: $CI_MERGE_REQUEST_ID
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH !reference 
+teardown:
+  stage: deploy
+  script:
+    - echo "Tearing down environment"
+  when: manual
+  environment:
+    name: production
+    action: stop
 
 
 
