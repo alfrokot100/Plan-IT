@@ -46,7 +46,6 @@ dockerize:
     - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY --username $CI_REGISTRY_USER --password-stdin
     - docker build -t $CI_REGISTRY_IMAGE:latest -f pipeline-utilities/Dockerfile .
     - docker push $CI_REGISTRY_IMAGE:latest
- privileged: true 
 check-portainer-connection:
   stage: check
   image: curlimages/curl:latest
