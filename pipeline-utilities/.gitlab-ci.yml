@@ -46,7 +46,7 @@ dockerize:
     - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY --username $CI_REGISTRY_USER --password-stdin
     - docker build -t $CI_REGISTRY_IMAGE:latest -f pipeline-utilities/Dockerfile .
     - docker push $CI_REGISTRY_IMAGE:latest
-
+ privileged: true 
 check-portainer-connection:
   stage: check
   image: curlimages/curl:latest
@@ -63,6 +63,8 @@ deploy:
     - set -e
     # Authenticate with Portainer
     - |
+      export PORTAINER_TOKEN=$(curl -X POST "https://portainer.doe24-2.swarm.chasacademy.dev/api/auth" --json '{"username": "'$PORTAINER_USER'", "password": "'$PORTAINER_PASSWORD'"}'| jq -r '.jwt')
+
       RESPONSE=$(curl -sk -X POST "$PORTAINER_URL/api/auth" \
         -H "Content-Type: application/json" \
         -d "{\"username\":\"$PORTAINER_USER\",\"password\":\"$PORTAINER_PW\"}")
