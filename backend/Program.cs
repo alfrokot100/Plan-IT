@@ -67,6 +67,14 @@ namespace TeamApp
             CommentEndpoints.MessageEndpoints(app);
             ProjectEndpoints.RegisterEndpoints(app);
 
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var context = services.GetRequiredService<TeamDBContext>();
+                context.Database.EnsureCreated(); // Or Migrate() if using migrations
+                SeedData.InitialiseDB(context);
+            }
+
             app.Run();
         }
     }
