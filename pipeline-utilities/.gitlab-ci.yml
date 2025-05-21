@@ -5,7 +5,8 @@ stages:
   - dockerize
   - check
   - deploy
-   -teardown
+  - teardown
+
 variables:
   DOTNET_CLI_TELEMETRY_OPTOUT: "1"
   DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1"
@@ -46,6 +47,7 @@ dockerize:
     - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY --username $CI_REGISTRY_USER --password-stdin
     - docker build -t $CI_REGISTRY_IMAGE:latest -f pipeline-utilities/Dockerfile .
     - docker push $CI_REGISTRY_IMAGE:latest
+
 check-portainer-connection:
   stage: check
   image: curlimages/curl:latest
@@ -101,16 +103,15 @@ deploy:
       echo "Deploy finished."
   rules:
     - if: $CI_MERGE_REQUEST_ID
-    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH !reference 
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+
 teardown:
-  stage: deploy
+  stage: teardown
   script:
     - echo "Tearing down environment"
   when: manual
   environment:
     name: production
     action: stop
-
-
 
 
