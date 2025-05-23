@@ -5,12 +5,12 @@ WORKDIR /src
 
 # Copy csproj which stores dependencies, and restore them
 COPY *.csproj .
-# COPY *.esproj rekurrens.client/rekurrens.client.esproj
-RUN dotnet restore rekurrens.server.csproj
+
+RUN dotnet restore TeamApp.csproj
 
 # Copy the rest and build
 COPY . .
-RUN dotnet publish rekurrens.server.csproj -property:AssemblyName=Rekurrens -o /app/out
+RUN dotnet publish TeamApp.csproj -property:AssemblyName=TeamApp -o /app/out
 
 # Move to runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
@@ -21,4 +21,4 @@ COPY --from=build /app/out .
 EXPOSE 80
 
 # Entrypoint
-ENTRYPOINT ["dotnet", "planit.dll"]
+ENTRYPOINT ["dotnet", "TeamApp.dll"]
