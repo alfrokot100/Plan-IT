@@ -1,117 +1,122 @@
+include:
+  - local: pipeline-utilities/variables.yml
+  - local: pipeline-utilities/templates.yml
+
 stages:
-  - restore
+  - pre-build
+  - check
   - build
   - test
-  - dockerize
-  - check
   - deploy
   - teardown
 
-variables:
-  DOTNET_CLI_TELEMETRY_OPTOUT: "1"
-  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: "1"
-
-restore:
-  stage: restore
-  image: mcr.microsoft.com/dotnet/sdk:8.0
-  script:
-    - cd backend
-    - dotnet restore
-
-build:
-  stage: build
-  image: mcr.microsoft.com/dotnet/sdk:8.0
-  script:
-    - cd backend
-    - dotnet build --configuration Release
-
-test:
-  stage: test
-  image: mcr.microsoft.com/dotnet/sdk:8.0
-  script:
-    - cd backend
-    - dotnet test --logger:trx
-  artifacts:
-    paths:
-      - backend/TestResults/
-    when: always
-
-dockerize:
-  stage: dockerize
+# Build builder based on docker:latest
+build-builder:
+  extends: .build-template
+  stage: pre-build
   image: docker:latest
-  services:
-    - docker:dind
-  variables:
-    DOCKER_DRIVER: overlay2
   script:
-    - echo "$CI_REGISTRY_PASSWORD" | docker login $CI_REGISTRY --username $CI_REGISTRY_USER --password-stdin
-    - docker build -t $CI_REGISTRY_IMAGE:latest -f pipeline-utilities/Dockerfile .
-    - docker push $CI_REGISTRY_IMAGE:latest
+    - cd "$PIPELINE_UTILS/builder"
+    - export IMAGE_NAME="$CI_REGISTRY_IMAGE/builder:latest"
+    - echo "Building $IMAGE_NAME"
+    - docker buildx build --cache-from="$IMAGE_NAME" -t "$IMAGE_NAME" --push -f Dockerfile-builder .
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      changes:
+        - $PIPELINE_UTILS/builder/*
 
-check-portainer-connection:
+# Runs a pipeline that builds a base of all 3 images on fresh merge requests.
+child-build-pipeline:
   stage: check
-  image: curlimages/curl:latest
+  trigger:
+    include:
+      - local: $PIPELINE_UTILS/build-base-images.yml
+    strategy: depend
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+  allow_failure: true
+
+# Generate and publish a new Dockerimage of our .NET-application
+# Runs on any change in back-end folder
+build-dotnet-image:
+  extends: .build-dotnet
+
+
+# Generate and publish a new Dockerimage of our React-application
+# Runs on any change in front-end folder
+#build-react-image:
+#  extends: .build-react
+
+# Generates an image of MSSQL and loads specified state from SQL file
+# Runs on any change to SQL-file
+#build-db-image:
+#  extends: .build-db
+
+# Build image containing python packages and script to deploy on Portainer
+# ONLY build on when on main branch and any relevant files change
+build-utils:
+  extends: .build-apps
   script:
-    - echo "Checking connection to Portainer at $PORTAINER_URL/api/status"
-    - curl -sk --connect-timeout 10 --max-time 20 "$PORTAINER_URL/api/status"
+    - cd "$PIPELINE_UTILS"/python-portainer
+    - export IMAGE_NAME="$CI_REGISTRY_IMAGE/utils:latest"
+    - echo "Building $IMAGE_NAME"
+    - docker buildx build --cache-from="$IMAGE_NAME" -t "$IMAGE_NAME" --push -f Dockerfile-utils .
+  rules:
+    - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+      changes:
+        - $PIPELINE_UTILS/python-portainer/*
+
+# Run all (fake) tests on codechange and ONLY on branches where there is a merge request
+run-tests:
+  stage: test
+  script:
+    - echo "TOTAL                  353     20    94%"
+  coverage: '/TOTAL.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+
+# Setup for teardown and deploy
+.base_util_setup:
+  image: $CI_REGISTRY_IMAGE/utils:latest
+  before_script:
+    - export ENDPOINT_NAME="primary"
+    - export CI_PROJECT_NAME=$(echo "$CI_PROJECT_NAME" | tr '[:upper:]' '[:lower:]')
+    - export CI_COMMIT_REF_NAME=$(echo "$CI_COMMIT_REF_NAME" | tr '[:upper:]' '[:lower:]')
+    - export STACK_NAME="g12-$CI_COMMIT_REF_SLUG"
+    - cd "$PIPELINE_UTILS"/python-portainer
+    - set -e
+
+# Environment name reference
+.environment_setup: &env_setup
+  name: review/$CI_COMMIT_REF_NAME
 
 deploy:
+  extends: .base_util_setup
   stage: deploy
-  image: python:3.10-alpine    
-  before_script:
-    - apk add --no-cache bash curl jq  
   environment:
-    name: production
-    url: https://g13-$CI_COMMIT_REF_SLUG.cc25.chasacademy.dev
+    <<: *env_setup
+    url: https://g12-$CI_COMMIT_REF_SLUG.cc25.chasacademy.dev
     on_stop: teardown
   script:
-    - echo "Deploying to Portainer"
-    - |
-      if [[ "$CI_COMMIT_REF_NAME" == "$CI_DEFAULT_BRANCH" ]]; then
-        export DOCKER_COMPOSE="docker-compose.yml"
-      else
-        export DOCKER_COMPOSE="docker-compose-test.yml"
-      fi
-    - cp ../$DOCKER_COMPOSE stack.yml
-    - |
-      RESPONSE=$(curl -sk -X POST "$PORTAINER_URL/api/auth" \
-        -H "Content-Type: application/json" \
-        -d '{"username": "'"$PORTAINER_USER"'", "password": "'"$PORTAINER_PW"'"}')
-      JWT=$(echo "$RESPONSE" | jq -r .jwt)
-      STACK_ID=$(curl -sk -H "Authorization: Bearer $JWT" "$PORTAINER_URL/api/stacks" | jq -r --arg name "$STACK_NAME" '.[] | select(.Name==$name) | .Id')
-      if [ -n "$STACK_ID" ]; then
-        echo "Updating existing stack: $STACK_NAME"
-        UPDATE_RESPONSE=$(curl -sk -X PUT "$PORTAINER_URL/api/stacks/$STACK_ID?endpointId=$ENDPOINT_ID" \
-          -H "Authorization: Bearer $JWT" \
-          -H "Content-Type: application/json" \
-          --data "$(jq -n --arg fileContent "$(cat stack.yml)" '{StackFileContent: $fileContent, Prune: true }')")
-        if echo "$UPDATE_RESPONSE" | jq -e '.message' >/dev/null; then
-          echo "Error updating stack: $(echo "$UPDATE_RESPONSE" | jq -r '.message')"
-          exit 1
-        fi
-      else
-        echo "Creating new stack: $STACK_NAME"
-        CREATE_RESPONSE=$(curl -sk -X POST "$PORTAINER_URL/api/stacks?type=1&method=string&endpointId=$ENDPOINT_ID" \
-          -H "Authorization: Bearer $JWT" \
-          -F "Name=$STACK_NAME" \
-          -F "StackFileContent=@stack.yml")
-        if echo "$CREATE_RESPONSE" | jq -e '.message' >/dev/null; then
-          echo "Error creating stack: $(echo "$CREATE_RESPONSE" | jq -r '.message')"
-          exit 1
-        fi
-      fi
-      echo "Deploy finished."
+    - echo "Deploy"
+    - cp ../docker-compose* .
+    # Get correct composefile for main or testbranch
+    - if [[ $CI_COMMIT_REF_NAME = $CI_DEFAULT_BRANCH ]]; then DOCKER_COMPOSE=docker-compose.yml; else DOCKER_COMPOSE=docker-compose-test.yml; fi
+    - python portainer.py $CI_JOB_STAGE -dc $DOCKER_COMPOSE
   rules:
     - if: $CI_MERGE_REQUEST_ID
     - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
 
 teardown:
+  extends: .base_util_setup
   stage: teardown
-  script:
-    - echo "Tearing down environment"
-  when: manual
+  image: $CI_REGISTRY_IMAGE/utils:latest
   environment:
-    name: production
+    <<: *env_setup
     action: stop
-
-
+  script:
+    - echo "Teardown"
+    - python portainer.py $CI_JOB_STAGE
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+      when: manual
