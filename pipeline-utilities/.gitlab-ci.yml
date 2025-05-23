@@ -82,7 +82,7 @@ run-tests:
     - export ENDPOINT_NAME="primary"
     - export CI_PROJECT_NAME=$(echo "$CI_PROJECT_NAME" | tr '[:upper:]' '[:lower:]')
     - export CI_COMMIT_REF_NAME=$(echo "$CI_COMMIT_REF_NAME" | tr '[:upper:]' '[:lower:]')
-    - export STACK_NAME="g12-$CI_COMMIT_REF_SLUG"
+    - export STACK_NAME="g13-$CI_COMMIT_REF_SLUG"
     - cd "$PIPELINE_UTILS"/python-portainer
     - set -e
 
