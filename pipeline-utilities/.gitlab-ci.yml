@@ -95,7 +95,7 @@ deploy:
   stage: deploy
   environment:
     <<: *env_setup
-    url: https://g12-$CI_COMMIT_REF_SLUG.cc25.chasacademy.dev
+    url: https://g13-$CI_COMMIT_REF_SLUG.cc25.chasacademy.dev
     on_stop: teardown
   script:
     - echo "Deploy"
