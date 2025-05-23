@@ -22,8 +22,8 @@
   - cp "$PIPELINE_UTILS"/dotnet/Dockerfile-dotnet "$DOTNET_FOLDER"
   # - cp "$REACT_FOLDER"/planit.client.esproj "$DOTNET_FOLDER"
   - cd "$DOTNET_FOLDER"
-  - envsubst <appsettings-secrets.json >appsettings.json
-  - cat appsettings.json
+  #- envsubst <appsettings-secrets.json >appsettings.json
+  #- cat appsettings.json
   - export IMAGE_NAME="$CI_REGISTRY_IMAGE/dotnet:$DOCKER_TAG"
   - echo "Building $IMAGE_NAME"
   - docker buildx build --cache-from="$IMAGE_NAME" -t "$IMAGE_NAME" --push -f Dockerfile-dotnet .
