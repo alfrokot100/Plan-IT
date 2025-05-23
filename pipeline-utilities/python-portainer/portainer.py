@@ -195,7 +195,7 @@ def postMergeRequestCommentWithUrls():
     ])
 
     # Generate comment for the MR
-    baseURL = f"g12-{CI_COMMIT_REF_SLUG}.cc25.chasacademy.dev"
+    baseURL = f"g13-{CI_COMMIT_REF_SLUG}.cc25.chasacademy.dev"
     commentContent = f"[MAIN](https://{baseURL}) - [API URL](https://api.{baseURL}) - [DB URL](https://db.{baseURL})"
 
     # Setup request
