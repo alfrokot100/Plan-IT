@@ -198,7 +198,7 @@ def postMergeRequestCommentWithUrls():
     baseURL = f"g13-{CI_COMMIT_REF_SLUG}.cc25.chasacademy.dev"
     commentContent = f"[MAIN](https://{baseURL}) - [API URL](https://api.{baseURL}) - [DB URL](https://db.{baseURL})"
 
-    # Setup request
+    # Setup quest
     request_endpoint = (f"https://git.chasacademy.dev/api/v4/projects/{CI_MERGE_REQUEST_PROJECT_ID}/merge_requests/{CI_MERGE_REQUEST_IID}/notes")
     request_header = {"PRIVATE-TOKEN": CI_API_TOKEN, "Content-Type": "application/json"}
 
