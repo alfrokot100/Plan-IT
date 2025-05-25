@@ -39,7 +39,7 @@ namespace TeamApp
             {
                 options.AddPolicy("MyReactApp", policy =>
                 {
-                    // se till att länken här matchar din frontend!
+                    // se till att lï¿½nken hï¿½r matchar din frontend!
                     policy.WithOrigins("http://localhost:5173")
                     .AllowAnyMethod()
                     .AllowAnyHeader();

@@ -71,7 +71,8 @@ namespace TeamApp.Services
                 UserID = u.UserID,
                 Username = u.Username,
                 Email = u.Email,
-                Role = u.Role
+                Role = u.Role,
+                Description = u.Description
             }).ToListAsync();
             return userList;
         }

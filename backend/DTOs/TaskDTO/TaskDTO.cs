@@ -9,12 +9,15 @@ namespace TeamApp.DTOs.TaskDTO
         public int TaskID { get; set; }
 
         [Required]
-        public int GoalID_FK { get; set; }
+        public int? GoalID_FK { get; set; }
         [Required]
         public string Title { get; set; }
 
         public string? Description { get; set; }
-
+        
+        public List<string>? TeamMembers { get; set; }
+        
+        //public string? TeamMember { get; set; }
         [Required]
         [RegularExpression("^(Avslutad|Ej påbörjad|Påbörjad|Pausad)$", ErrorMessage = "Ogiltig status")]
 

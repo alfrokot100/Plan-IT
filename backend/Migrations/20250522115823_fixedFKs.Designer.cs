@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TeamApp.Data;
 
@@ -11,9 +12,11 @@ using TeamApp.Data;
 namespace TeamApp.Migrations
 {
     [DbContext(typeof(TeamDBContext))]
-    partial class TeamDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250522115823_fixedFKs")]
+    partial class fixedFKs
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

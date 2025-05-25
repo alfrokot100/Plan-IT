@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TeamApp.Data;
 
@@ -11,9 +12,11 @@ using TeamApp.Data;
 namespace TeamApp.Migrations
 {
     [DbContext(typeof(TeamDBContext))]
-    partial class TeamDBContextModelSnapshot : ModelSnapshot
+    [Migration("20250520122718_init")]
+    partial class init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -56,6 +59,43 @@ namespace TeamApp.Migrations
                     b.HasIndex("UserID_FK");
 
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("TeamApp.Models.Goal", b =>
+                {
+                    b.Property<int>("GoalID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GoalID"));
+
+                    b.Property<DateTime>("Deadline")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Priority")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<int>("UserID_FK")
+                        .HasColumnType("int");
+
+                    b.HasKey("GoalID");
+
+                    b.HasIndex("UserID_FK");
+
+                    b.ToTable("Goals");
                 });
 
             modelBuilder.Entity("TeamApp.Models.LogEntry", b =>
@@ -118,39 +158,6 @@ namespace TeamApp.Migrations
                     b.HasIndex("UserID_FK");
 
                     b.ToTable("Notifications");
-                });
-
-            modelBuilder.Entity("TeamApp.Models.Project", b =>
-                {
-                    b.Property<int>("ProjectID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ProjectID"));
-
-                    b.Property<DateTime>("Deadline")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<int?>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("UserID_FK")
-                        .HasColumnType("int");
-
-                    b.HasKey("ProjectID");
-
-                    b.HasIndex("UserID_FK");
-
-                    b.ToTable("Projects");
                 });
 
             modelBuilder.Entity("TeamApp.Models.Task", b =>
@@ -297,6 +304,17 @@ namespace TeamApp.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TeamApp.Models.Goal", b =>
+                {
+                    b.HasOne("TeamApp.Models.User", "User")
+                        .WithMany("Goals")
+                        .HasForeignKey("UserID_FK")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("TeamApp.Models.LogEntry", b =>
                 {
                     b.HasOne("TeamApp.Models.User", "User")
@@ -319,20 +337,9 @@ namespace TeamApp.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("TeamApp.Models.Project", b =>
-                {
-                    b.HasOne("TeamApp.Models.User", "User")
-                        .WithMany("Goals")
-                        .HasForeignKey("UserID_FK")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
             modelBuilder.Entity("TeamApp.Models.Task", b =>
                 {
-                    b.HasOne("TeamApp.Models.Project", "Goal")
+                    b.HasOne("TeamApp.Models.Goal", "Goal")
                         .WithMany("Tasks")
                         .HasForeignKey("GoalID_FK")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -369,7 +376,7 @@ namespace TeamApp.Migrations
                     b.Navigation("user");
                 });
 
-            modelBuilder.Entity("TeamApp.Models.Project", b =>
+            modelBuilder.Entity("TeamApp.Models.Goal", b =>
                 {
                     b.Navigation("Tasks");
                 });
