@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿    using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TeamApp.Models
@@ -11,7 +11,7 @@ namespace TeamApp.Models
         // Foreign Keys + navigation properties
 
         [ForeignKey("Goal")]
-        public int GoalID_FK { get; set; }
+        public int? GoalID_FK { get; set; }
         public virtual Project Goal { get; set; }
 
         [Required]

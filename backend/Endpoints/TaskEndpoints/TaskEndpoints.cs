@@ -33,9 +33,10 @@ namespace TeamApp.Endpoints.TaskEndpoints
                 return Results.Ok(tasks);
             });
 
-            app.MapPost("/tasks", async (CreateTaskDTO taskDto, int userId, TaskService taskservice) =>
+            app.MapPost("/tasks", async (CreateTaskDTO taskDto, TaskService taskservice) =>
             {
-                var newTask = await taskservice.AddTask(taskDto, userId);
+                var newTask = await taskservice.AddTask(taskDto);
+                Console.WriteLine(taskDto);
                 Console.WriteLine("Endpoint anropad");
                 if (newTask == null)
                 {
@@ -67,6 +68,11 @@ namespace TeamApp.Endpoints.TaskEndpoints
                 if (!filteredTasks.Any())
                 {
                     return Results.NotFound("Inga tasks matchade sökningen.");
+                }
+
+                foreach (var task in filteredTasks)
+                {
+                    
                 }
                 return Results.Ok(filteredTasks);
             });

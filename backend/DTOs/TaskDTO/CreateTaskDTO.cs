@@ -7,7 +7,7 @@ namespace TeamApp.DTOs.TaskDTO
     {
 
         [Required]
-        public int GoalID_FK { get; set; }
+        public int? GoalID_FK { get; set; }
         [Required]
         public string Title { get; set; }
 
@@ -15,7 +15,9 @@ namespace TeamApp.DTOs.TaskDTO
 
         [Required]
         public DateTime DueDate { get; set; }
+        
+        public string? Status { get; set; }
 
-        //public virtual ICollection<UserTask> UserTasks { get; set; }
+        public int UserID_FK { get; set; }
     }
 }

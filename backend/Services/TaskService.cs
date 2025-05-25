@@ -28,6 +28,7 @@ namespace TeamApp.Services
                 TaskID = t.TaskID,
                 Title = t.Title,
                 DueDate = t.DueDate,
+                Description = t.Description
             }).ToListAsync();
             return taskList;
         }
@@ -57,25 +58,24 @@ namespace TeamApp.Services
 
             return task;
         }
-        public async Task<TaskDTO?> AddTask(CreateTaskDTO taskDto, int userId)
+        public async Task<TaskDTO?> AddTask(CreateTaskDTO taskDto)
         {
             Models.Task newTask = new Models.Task
             {
                 Title = taskDto.Title,
                 Description = taskDto.Description,
-                Status = "Ej påbörjad",
+                Status = taskDto.Status,
                 DueDate = taskDto.DueDate,
-                GoalID_FK = taskDto.GoalID_FK
+                GoalID_FK = taskDto.GoalID_FK//ändra
             };
 
             context.Tasks.Add(newTask);
             var taskSaved = await context.SaveChangesAsync();
             if (taskSaved == 0) return null;
-
             var newUserTask = new UserTask
             {
-                user = await context.Users.FindAsync(userId),
-                task = newTask
+                userID_FK = taskDto.UserID_FK, //Ändra
+                taskID_FK = newTask.TaskID
             };
 
             context.UserTasks.Add(newUserTask);
@@ -133,10 +133,12 @@ namespace TeamApp.Services
             {
                 query = query.Where(t => t.Title.Contains(search) || t.Description.Contains(search));
             }
+
             if (!string.IsNullOrEmpty(status))
             {
                 query = query.Where(t => t.Status == status);
             }
+
             if (assignedUser != null)
             {
                 query = query.Where(t => t.UserTasks.Any(ut => ut.userID_FK == assignedUser));
@@ -146,18 +148,26 @@ namespace TeamApp.Services
             {
                 query = query.OrderBy(t => t.DueDate);
             }
+
             if (orderBy == "title")
             {
                 query = query.OrderBy(t => t.Title);
             }
-            return await query.Select(t => new TaskDTO
+
+            var taskList = await query.ToListAsync();
+
+            return taskList.Select(t => new TaskDTO
             {
                 TaskID = t.TaskID,
                 Title = t.Title,
                 Description = t.Description,
                 Status = t.Status,
-                DueDate = t.DueDate
-            }).ToListAsync();
+                DueDate = t.DueDate,
+                //TeamMember = context.UserTasks.Include(ut => ut.user).FirstOrDefault(ut => ut.taskID_FK == t.TaskID)?.user?.Username
+                TeamMembers = context.UserTasks
+                    .Where(ut => ut.taskID_FK == t.TaskID)
+                    .Select(ut => ut.user.Username).ToList()
+            }).ToList();
         }
 
         public async Task<UserDTO> AddUserToTeam(int teamId, int userId)
