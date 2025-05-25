@@ -27,7 +27,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:80
       # Optional dummy connection string if app requires it
-      - ConnectionStrings__DefaultConnection=Server=localhost;Database=placeholder;User=none;Password=none;TrustServerCertificate=True
+      # - ConnectionStrings__DefaultConnection=Server=localhost;Database=placeholder;User=none;Password=none;TrustServerCertificate=True
     # Removed: depends_on: - planit-db
 
 networks:
