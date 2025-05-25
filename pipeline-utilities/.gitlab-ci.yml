@@ -44,8 +44,8 @@ build-dotnet-image:
 
 # Generate and publish a new Dockerimage of our React-application
 # Runs on any change in front-end folder
-#build-react-image:
-#  extends: .build-react
+build-react-image:
+  extends: .build-react
 
 # Generates an image of MSSQL and loads specified state from SQL file
 # Runs on any change to SQL-file
