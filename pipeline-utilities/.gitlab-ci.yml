@@ -43,7 +43,7 @@ build-dotnet-image:
 
 
 # Generate and publish a new Dockerimage of our React-application
-# Runs on any change in front-end folder
+# Runs on any change in front-end fold
 build-react-image:
   extends: .build-react
 
