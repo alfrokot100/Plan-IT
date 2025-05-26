@@ -1,6 +1,31 @@
 version: "3.9"
 
 services:
+  planit-frontend:
+    image: registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/react:${DOCKER_TAG}
+    networks:
+      - rekurrens-network
+      - traefik-public
+    deploy:
+      mode: replicated
+      replicas: 1
+      labels:
+        - traefik.enable=true
+        - traefik.docker.network=traefik-public
+        - traefik.constraint-label=traefik-public
+        - traefik.http.routers.${STACK_NAME}-http.rule=Host(`${STACK_NAME}.cc25.chasacademy.dev`)
+        - traefik.http.routers.${STACK_NAME}-http.entrypoints=http
+        - traefik.http.routers.${STACK_NAME}-http.middlewares=https-redirect
+        - traefik.http.routers.${STACK_NAME}-https.rule=Host(`${STACK_NAME}.cc25.chasacademy.dev`)
+        - traefik.http.routers.${STACK_NAME}-https.entrypoints=https
+        - traefik.http.routers.${STACK_NAME}-https.tls=true
+        - traefik.http.routers.${STACK_NAME}-https.tls.certresolver=le
+        - traefik.http.routers.<DIN-HTTPS-ROUTER>.tls.domains[0].main=cc25.chasacademy.dev
+        - traefik.http.routers.<DIN-HTTPS-ROUTER>.tls.domains[0].sans=*.cc25.chasacademy.dev
+        - traefik.http.services.${STACK_NAME}.loadbalancer.server.port=80
+    environment:
+      - API_URL=http://plan-it-backend:80
+
   planit-backend:
     image: registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/dotnet:${DOCKER_TAG}
     networks:
@@ -29,6 +54,29 @@ services:
       # Optional dummy connection string if app requires it
       # - ConnectionStrings__DefaultConnection=Server=localhost;Database=placeholder;User=none;Password=none;TrustServerCertificate=True
     # Removed: depends_on: - planit-db
+
+  planit-db:
+    image: registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/mssql-db:latest
+    networks:
+      - rekurrens-network
+    deploy:
+      mode: replicated
+      replicas: 1
+      placement:
+        constraints:
+          - node.labels.storage == true
+    volumes:
+      - mssql-data:/var/opt/mssql
+    environment:
+      - ACCEPT_EULA=YES
+      - MSSQL_SA_PASSWORD=${DB_PASSWORD}
+      - MSSQL_PID=Developer
+      - MSSQL_AGENT_ENABLED=true
+
+volumes:
+  mssql-data:
+    name: mssql-data-volume
+
 
 networks:
   planit-network:
