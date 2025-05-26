@@ -14,7 +14,8 @@ namespace TeamApp.DTOs.TaskDTO
         public string Title { get; set; }
 
         public string? Description { get; set; }
-        
+        public string? Project { get; set; }
+
         public List<string>? TeamMembers { get; set; }
         
         //public string? TeamMember { get; set; }
