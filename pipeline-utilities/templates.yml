@@ -33,3 +33,19 @@
     changes:
     - $DOTNET_FOLDER/**/*
     #- $REACT_FOLDER/planit.client.esproj
+
+.build-react:
+  extends: .build-apps
+  script:
+  - cp "$PIPELINE_UTILS"/react/* "$REACT_FOLDER"
+  - cd "$REACT_FOLDER"
+  - export IMAGE_NAME="$CI_REGISTRY_IMAGE/react:$DOCKER_TAG"
+  - echo "Building $IMAGE_NAME"
+  #- docker buildx build --cache-from="$IMAGE_NAME" -t "$IMAGE_NAME" --push -f Dockerfile-react .
+  - docker buildx build --pull -t "$IMAGE_NAME" --push -f Dockerfile-react .
+
+  rules:
+  - if: $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH
+  - if: $CI_MERGE_REQUEST_ID
+    changes:
+    - $REACT_FOLDER/**/*
