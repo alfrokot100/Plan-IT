@@ -28,7 +28,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:80
-      - ConnectionStrings__DefaultConnection=Server=planit-db;Database=PlanItDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True
+      - ConnectionStrings__DefaultConnection=Server=planit-db;Database=PlanItDb;User Id=sa;Password=PlAn@iT!521;TrustServerCertificate=True
 
   planit-db:
     image: mcr.microsoft.com/mssql/server:2022-latest
