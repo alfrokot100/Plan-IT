@@ -2,7 +2,7 @@ version: "3.9"
 
 services:
   planit-frontend:
-    image: registry.chasacademy.dev/chas-challenge-2025/group-13/planit/react:${DOCKER_TAG}
+    image: registry.chasacademy.dev/chas-challenge-2025/group-13/plan-it/react:${DOCKER_TAG}
     networks:
       - planit-network
       - traefik-public
