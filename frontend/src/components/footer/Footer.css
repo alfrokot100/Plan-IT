@@ -1,0 +1,22 @@
+.footer-container{
+  background-color: rgb(255, 255, 255);
+  color: #4f46e5;
+  padding-left: 40px;
+  padding-right: 40px;
+  padding-top: 40px;
+  padding-bottom: 40px;
+  display: flex;
+  justify-content: space-between;}
+
+  .footer-socials{
+    list-style-type: none;
+    display: flex;
+    gap: 20px;
+    margin: 0;
+    padding-top: 100px;}
+
+    a :hover{
+      cursor: pointer;
+      background-color: blue;
+    }
+  

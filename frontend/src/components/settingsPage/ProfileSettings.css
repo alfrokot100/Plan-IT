@@ -1,0 +1,107 @@
+.profile-card {
+  background-color: #fff;
+  padding: 32px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  max-width: 800px;
+  margin: 40px auto;
+  font-family: 'Segoe UI', sans-serif;
+  margin-top: 0;
+}
+
+.profile-header h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.profile-header p {
+  margin-top: 4px;
+  color: #666;
+  font-size: 14px;
+}
+
+.avatar-section {
+  display: inline-flex;
+  align-items: center;
+  margin: 24px 0;
+}
+
+.avatar-circle {
+  width: 60px;
+  height: 60px;
+  background-color: #e5e7eb;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 20px;
+  color: #374151;
+  margin-right: 16px;
+}
+
+.avatar-text button.change-avatar-btn {
+  background: transparent;
+  border: none;
+  color: #2563eb;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 0;
+}
+
+.avatar-text p {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.form-group input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.full-width {
+  grid-column: span 2;
+}
+
+.button-wrapper {
+  margin-top: 24px;
+  text-align: right;
+}
+
+.save-btn {
+  background-color: #2563eb;
+  color: white;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.save-btn:hover {
+  background-color: #1d4ed8;
+}

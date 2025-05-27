@@ -1,0 +1,237 @@
+.team-directory {
+  background-color: #fff;
+  padding: 70px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  min-width: 70%;
+  margin: 30px auto;
+  font-family: 'Segoe UI', sans-serif;
+  margin-left: 20rem;
+}
+
+.header-directory {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  justify-content: space-between;
+  margin-bottom: 2rem;
+  gap: 2rem;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+
+.header-directory h2 {
+  margin: 0px;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.header-directory p {
+  margin-top: 4px;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+
+.filters { 
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.filters input,
+.filters select {
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+  background-color: #f9f9f9;
+  transition: border-color 0.2s ease-in-out;
+}
+
+.filters input:focus,
+.filters select:focus {
+  border-color: #6b8fd5;
+  outline: none;
+}
+
+.search-input{
+  flex: 1;
+  min-width: 200px;
+}
+
+.sort-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sort-control select {
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 5rem;
+  margin-bottom: 2rem;
+}
+
+.card {
+  display: grid;
+  grid-template-rows: auto 1fr auto;  
+  gap: 1rem;
+  border: 1px solid #e5e7eb;
+  padding: 1.7rem;
+  border-radius: 12px;
+  background: #e3e3e3;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+  text-align: center;
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card-title{
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #111827;
+  padding: 0;
+  margin: 0;
+}
+
+.card-body{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+.card-subtitle{
+  font-size: 1rem;
+  color: #4b5563;
+  margin: 0 0;
+  text-align: right;
+}
+
+.card-subtitle-right{
+  font-size: 1rem;
+  color: #4b5563;
+  margin: 0 0;
+  text-align: left
+}
+
+
+.card button {
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #6b8fd5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.card button:hover {
+  background-color: #4b6fb5;
+}
+
+.avatar-circle {
+  width: 60px;
+  height: 60px;
+  background-color: #6b8fd5a1;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 20px;
+  color: #ffffff;
+  margin: 0 auto 1rem;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.pagination button {
+  padding: 0.5rem 0.75rem;
+  border: none;
+  background-color: #e5e7eb;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  background-color: #f3f4f6;
+  cursor: not-allowed;
+}
+
+.per-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  margin-bottom: 2rem;
+}
+
+.modal {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #ffffff;
+  padding: 2rem;
+  border-radius: 12px;
+  max-width: 420px;
+  width: 90%;
+  position: relative;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  font-size: 1.5rem;
+  color: #111827;
+}
+
+.modal-content p {
+  font-size: 0.95rem;
+  color: #4b5563;
+  margin: 0.5rem 0;
+}
+
+.close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  font-size: 1rem;
+  background-color: transparent;
+  color: #6b7280;
+  border: none;
+  cursor: pointer;
+}
+
+.close-btn:hover {
+  color: #111827;
+}
