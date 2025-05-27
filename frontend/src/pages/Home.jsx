@@ -5,14 +5,16 @@ import WhyChoose from '../components/homePage/WhyChoose';
 import FeaturesGrid from '../components/homePage/FeaturesGrid';
 import HowItWorks from '../components/homePage/HowItWorks';
 import CallToAction from '../components/homePage/CallToAction';
+import PublicNavbar from "../components/navbar/PublicNavbar";
 
 
       
     const Home = () => {
       return (
         <div>
+          <PublicNavbar />
           <HeroSection />
-          {/* Här kommer nästa sektioner senare */}
+          
           <WhyChoose />
           <FeaturesGrid />
           {<HowItWorks /> }

@@ -1,6 +1,7 @@
 import React from 'react';
 import styles from './HeroSection.module.css';
 import teamImage from "../../assets/team.svg";
+import { Link } from 'react-router-dom';
 
 const HeroSection = () => {
   return (
@@ -13,8 +14,8 @@ const HeroSection = () => {
       </h1>
       <p>Den kompletta plattformen för teambyggande, målspårning och välmående.</p>
       <div className={styles.buttons}>
-        <button className={styles.primary}>Prova gratis</button>
-        <button className={styles.secondary}>Boka demo</button>
+        <button className={styles.primary} ><Link to="/register">Prova gratis</Link></button>
+        <button className={styles.secondary}><Link to="/about">Boka demo</Link></button>
       </div>
     </div>
 

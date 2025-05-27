@@ -2,6 +2,7 @@
   padding: 4rem 1rem;
   background-color: #f9f9f9;
   margin-bottom: 4rem;
+  font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .header {
@@ -56,7 +57,7 @@
 
 .listItem {
   display: flex;
-  align-items: center; /* ⬅ centrera vertikalt */
+  align-items: center; 
   gap: 0.5rem;
   margin-bottom: 0.75rem;
   font-size: 0.95rem;

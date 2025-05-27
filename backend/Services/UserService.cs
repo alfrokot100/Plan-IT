@@ -72,7 +72,10 @@ namespace TeamApp.Services
                 Username = u.Username,
                 Email = u.Email,
                 Role = u.Role,
-                Description = u.Description
+                Description = u.Description,
+                Team = context.Teams.Where(t => t.TeamID == u.TeamID_FK)
+                    .Select(t => t.Name)
+                    .FirstOrDefault() // Hämta teamnamn
             }).ToListAsync();
             return userList;
         }

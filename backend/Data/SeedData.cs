@@ -14,11 +14,11 @@ namespace TeamApp.Data
                 Name = "Team 1",
                 Description = "Team number one"
                 },
-                                new() {
+                new() {
                 Name = "Team 2",
                 Description = "Team number two"
                 },
-                                                new() {
+                new() {
                 Name = "Team 3",
                 Description = "Team number three"
                 },

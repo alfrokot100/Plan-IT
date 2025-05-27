@@ -5,9 +5,9 @@ function WhyChoose() {
   return (
     <section className={styles.whySection}>
       <div className={styles.header}>
-        <h2 className={styles.title}>Varför team väljer PlanIt</h2>
+        <h2 className={styles.title}>Varför team väljer BuildBoard</h2>
         <p className={styles.description}>
-          Team är komplexa, men att hantera dem behöver inte vara det. Planit samlar viktiga verktyg i en sömlös upplevelse.
+          Team är komplexa, men att hantera dem behöver inte vara det. BuildBoard samlar viktiga verktyg i en sömlös upplevelse.
         </p>
       </div>
 

@@ -163,6 +163,9 @@ namespace TeamApp.Services
                 Description = t.Description,
                 Status = t.Status,
                 DueDate = t.DueDate,
+                Project = context.Projects
+                    .Where(p => p.ProjectID == t.GoalID_FK)
+                    .Select(p => p.Title).FirstOrDefault(),
                 //TeamMember = context.UserTasks.Include(ut => ut.user).FirstOrDefault(ut => ut.taskID_FK == t.TaskID)?.user?.Username
                 TeamMembers = context.UserTasks
                     .Where(ut => ut.taskID_FK == t.TaskID)

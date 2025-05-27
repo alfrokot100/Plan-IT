@@ -1,15 +1,115 @@
 
-.btn-1{
-  background-color: transparent;
-  color: rgb(185, 185, 185);
-  border: none;
-  cursor: pointer;
-  font-size: 26px;
-  font-weight: bold;
-  text-align: right;
+.modal-content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  padding: 60px 80px 80px 80px;
+  border-radius: 8px;
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 12px;
+  z-index: 1000;
 }
 
 
-.btn-1:hover{
-  color: black;
+.modal-header {
+  display: grid;
+  background-color: white;
+  margin-top: 0;
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border-bottom: rgb(166, 166, 166) 1px solid;
+}
+
+.modal-close{
+  font-size: 32px;
+  color: #4b5563;
+  position: absolute;
+  top: 60px;
+  right: 50px;
+  transition: color 0.2s ease-in-out;
+  background-color: white;
+  border: none;
+}
+
+.modal-close:hover {
+  color: #0051ff;
+  cursor: pointer;
+}
+
+
+
+.modal-form{
+  background-color:white;
+  display: grid;
+  grid-template-columns: repeat  (2, 2fr);
+  padding: 20px 20px 20px 20px;
+  gap: 2rem;
+  border-radius: 8px;
+  box-shadow:none;
+}
+
+.form-label {
+  color: #111827;
+  margin-bottom: 0px;
+  font-weight: 600;
+  font-size: 14px;
+  padding: 0px;
+}
+
+.form-input{
+  padding: 10px;
+  border: 2px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #374151;
+  width: 100%;
+  margin-top: 8px;
+}
+
+
+
+.todo-btn {
+  background-color: #2563eb;
+  color: white;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.todo-btn:hover {
+  background-color: #1d4ed8;
+}
+
+
+.cancel-btn{
+  background-color: #aeb1b8;
+  color: white;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cancel-btn:hover{
+  background-color: #a3a3a3;
+
+}
+
+.modal-footer{  
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 40px;
+  border-top: rgb(166, 166, 166) 1px solid;
 }
