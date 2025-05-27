@@ -13,20 +13,24 @@
   padding: 32px 24px 24px;
   gap: 16px;
   text-align: center;
+  margin-bottom: 3rem;
 }
 
-/*Form text*/
-.title {
+
+.form-title {
   font-weight: bold;
   font-size: 1.6rem;
+  padding-bottom: 0px;
+  margin-bottom: 0px;
 }
 
-.subtitle {
+.form-subtitle {
+  padding-top: 0px;
+  margin-top: 0px;
   font-size: 1rem;
   color: #666;
 }
 
-/*Inputs box*/
 .form-container {
   overflow: hidden;
   border-radius: 8px;
@@ -79,4 +83,6 @@
 
 .form button:hover {
   background-color: #005ce6;
+  cursor: pointer;
 }
+

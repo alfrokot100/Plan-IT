@@ -29,8 +29,8 @@ function FeaturesGrid() {
     <section className={styles.featuresSection}>
      
       <div className={styles.sectionHeader}>
-        <h2 className={styles.sectionTitle}>Everything you need in one place</h2>
-        <p className={styles.sectionTitle}>Combinerar teambuilding och projektledning i en sömlös upplevelse.</p>
+        <h2 className={styles.sectionTitle}>Allt du behöver på en plats.</h2>
+        <p className={styles.sectionTitle}>Kombinerar teambuilding och projektledning i en sömlös upplevelse.</p>
       </div>
 
       <div className={styles.grid}>

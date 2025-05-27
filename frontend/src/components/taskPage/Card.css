@@ -1,65 +1,92 @@
+.card-style {
+  border-radius: 12px;
+  padding: 24px;
+  margin: 16px 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border-left: 6px solid transparent;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background-color: #fff;
+  z-index: 1;
 
-
-.card-style{
-  border-radius: 8px;
-  padding: 20px;
-  margin: 10px;
-  box-shadow: 0 8px 14px rgba(0, 0, 0, 0.1);
 }
 
-.card-header{
-  font-size: 18px;
-  font-weight: bold;
+.card-style:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.card-header h4 {
+  margin: 0;
+  font-size: 1.25rem;
   color: #333;
-  display: grid;
-  grid-template-columns: 7fr 1fr;
+  font-weight: 600;
 }
 
-.userProfilePicture{
+.edit-btn {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+}
+
+.edit-btn img {
+  width: 20px;
+  height: 20px;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
+}
+
+.edit-btn:hover img {
+  opacity: 1;
+}
+
+.card-main {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: #444;
+  font-size: 0.95rem;
+  margin-top: 12px;
+}
+
+.task-deadline {
+  color: #666;
+  font-weight: 500;
+}
+
+.userProfilePicture {
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  margin-right: 0px;
+  margin-right: 6px;
+  vertical-align: middle;
 }
 
-.task-deadline{
-  color: black;
-  background-color: transparent;
-  justify-content: center;
-  align-items: center;
-} 
-
-
-.card-main{
-  align-items: center;
-  font-weight: normal;
-  color: black;
+.card-footer {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  padding-bottom: 6px;}
-
-
-.add-label{
-  background-color: transparent;
-  color: #a2a2a2d8;
-  font-size: 14px;
-  font-weight: light;
-  margin: none;
-  border: none;
+  margin-top: 14px;
+  font-size: 0.9rem;
+  color: #777;
 }
 
-.add-label:hover{
-  color: black;
-  cursor: pointer;
-}   
-
-.edit-btn{
-  background-color: transparent;
+.add-label {
+  background: none;
   border: none;
+  color: #888;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
 }
 
-.edit-btn:hover{
-  color: black;
-  cursor: pointer;
+.add-label:hover {
+  color: #000;
 }

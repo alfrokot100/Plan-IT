@@ -1,0 +1,105 @@
+.todays-focus-wrapper {
+  background: white;
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 50%; 
+  min-width: 300px;
+  box-sizing: border-box;
+}
+
+
+
+.focus-header {
+  margin-bottom: 16px;
+  text-align: center;
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.task-item {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+  transition: box-shadow 0.2s ease;
+}
+
+.task-item:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.task-name {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 16px;
+  color: #111827;
+}
+
+.task-status-dot {
+  height: 10px;
+  width: 10px;
+  border-radius: 50%;
+}
+
+.status-ongoing {
+  background-color: #4361EE;
+}
+
+.status-warning {
+  background-color: #f59e0b;
+}
+
+.priority-high,
+.priority-medium {
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 12px;
+  color: white;
+  font-weight: 500;
+}
+
+.priority-high {
+  background-color: #4361EE;
+}
+
+.priority-medium {
+  background-color: #f59e0b;
+}
+
+.task-due {
+  font-size: 14px;
+  color: #6b7280;
+  margin-left: 22px;
+}
+
+.view-all-button {
+  margin-top: 16px;
+  padding: 10px 16px;
+  background-color: #4361EE;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.view-all-button:hover {
+  background-color: #3a4ddb;
+}
+
+

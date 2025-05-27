@@ -17,9 +17,9 @@ export default function CardContainer({ title, tasks, numberOfTasks }) {
     <div style={{ flex: 1, margin: "0 10px" }}>
 
       <header className="card-container-header">
-      <h3>{title}</h3>
-      <h3 className="number-of-tasks">{numberOfTasks} TASKS</h3>
-       <Modal onAddTask={handleNewTask} />
+      <h3 className="card-title">{title}</h3>
+      <h3 className="number-of-tasks">{numberOfTasks}</h3>
+      
       </header>
 
       {tasks.map((task, index) => (

@@ -1,114 +1,234 @@
+import axios from "axios";
+import "./Modal.css";
+import { useState, useEffect } from "react";
 
-import './Modal.css'
-import { useState } from "react";
+
+
+//Dropdown of users
+function UserDropdown({ value, onChange }) {
+  const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchUsernames() {
+      try {
+        const response = await axios.get("https://localhost:7007/Users");
+        setUsers(response.data);
+        console.log(users);
+      } catch (error) {
+        console.error("Error fetching usernames:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchUsernames();
+  }, []);
+ 
+  return (
+    <div>
+      <label htmlFor="user" className="form-label">Tilldelad till</label>
+      <br />
+      <select
+        id="user"
+        name="UserID_FK"
+        value={value}
+        onChange={onChange}
+        className="form-input"
+        disabled={loading}
+      >
+        <option value=""  >-- Välj en användare --</option>
+        {users.map((user) => (
+          <option key={user.userID} value={user.userID}>
+            {user.username}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+  //Dropdown of projects
+ function ProjectDropdown({ value, onChange }) {
+  const [projects, setProjects] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchProjects() {
+      try {
+        const response = await axios.get("https://localhost:7007/api/projects");
+        setProjects(response.data);
+        console.log(projects);
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchProjects();
+  }, []);
+
+  return (
+    <div>
+      <label htmlFor="project" className="form-label">Projekt</label>
+      <br />
+      <select
+        id="project"
+        name="GoalID_FK"
+        value={value}
+        onChange={onChange}
+        className="form-input"
+        disabled={loading}
+      >
+        <option value="">-- Välj ett projekt --</option>
+        {projects.map((project) => (
+          <option key={project.projectID} value={project.projectID}>
+            {project.title}
+          </option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+
 
 export default function Modal({ onAddTask }) {
   const [isOpen, setIsOpen] = useState(false);
 
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    deadline: "",
-    teamMember: "",
-    project: "",
-    labelcolor: "",
-    status: "To Do", // default status
+    Title: "",
+    Description: "",
+    DueDate: "",
+    UserID_FK: "",
+    GoalID_FK: "",
+    Status: "Ej påbörjad", // default status
   });
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onAddTask(formData); // pass task up
+    const taskParsed = {
+      ...formData,
+      UserID_FK: parseInt(formData.UserID_FK, 10),
+      GoalID_FK: parseInt(formData.GoalID_FK, 10)
+    }
+    onAddTask(taskParsed); // pass to parent
     setIsOpen(false);
-    setFormData({
-      title: "",
-      description: "",
-      deadline: "",
-      teamMember: "",
-      project: "",
-      labelcolor: "",
-      status: "To Do",
-    });
+    console.log("Submitting taskParsed:", taskParsed);
+
+    try {
+      const response = await axios.post(`https://localhost:7007/tasks`, taskParsed);
+      console.log("Task added successfully:", response.data);
+    } catch (error) {
+      console.error("Error adding task:", error);
+    }
   };
 
   return (
     <>
-      <button onClick={() => setIsOpen(true)} className="custom-btn btn-1">+</button>
+
+
+    
+      <button onClick={() => setIsOpen(true)} className="todo-btn">
+        <img src="/src/assets/add.svg" alt="New Task" />    New Task 
+      </button>
 
       {isOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-          }}
-        >
-          <div
-            style={{
-              backgroundColor: "white",
-              padding: "1rem",
-              width: "300px",
-              position: "relative"
-            }}
-          >
+        
+        
+        <div className="modal-container">
+          <div className="modal-content">
+
+
+            <header className="modal-header">
+            <h2 className="modal-title">Lägg till en uppgift</h2>
             <button
               type="button"
               onClick={() => setIsOpen(false)}
-              style={{
-                position: "absolute",
-                top: 5,
-                right: 10,
-                border: "none",
-                background: "none",
-                fontSize: "18px",
-              }}
+              className="modal-close"
             >
               ×
             </button>
 
-            <h2>Add Task</h2>
+            <div className="modal-subtitle">
+              <p> Obligatoriska fält är markerade med en asterisk *</p>
+            </div>
+            </header>
 
-            <form onSubmit={handleSubmit}>
+
+           
+            <form onSubmit={handleSubmit} className="modal-form">
+              
               <div>
-                <label>Title:</label><br />
-                <input type="text" name="title" value={formData.title} onChange={handleChange} required />
+                <label className="form-label">Rubrik*</label>
+                <br />
+                <input
+                  type="text"
+                  name="Title"
+                  value={formData.Title}
+                  onChange={handleChange}
+                  className="form-input"
+                  required
+                />
               </div>
 
               <div>
-                <label>Due Date:</label><br />
-                <input type="date" name="deadline" value={formData.deadline} onChange={handleChange} required />
+                <label className="form-label">Förfallodatum*</label>
+                <br />
+                <input
+                  type="date"
+                  name="DueDate"
+                  value={formData.DueDate}
+                  onChange={handleChange}
+                  className="form-input"
+                  required
+                />
+              </div>
+
+              <UserDropdown
+                value={formData.UserID_FK}
+                onChange={handleChange}
+              />
+
+              <div>
+
+              <ProjectDropdown
+                value={formData.ProjectID_FK}
+                onChange={handleChange}
+              />
+                <br />
               </div>
 
               <div>
-                <label>Assigned To:</label><br />
-                <input type="text" name="teamMember" value={formData.teamMember} onChange={handleChange} required />
+                <label for="status" className="form-label">Status*</label>
+                <br />
+                
+                <select id="status" name="Status" value={formData.Status} onChange={handleChange} className="form-input" required>
+                <option value="Ej påbörjad">Ej påbörjad</option>
+                <option value="Påbörjad">Påbörjad</option>
+                <option value="Avslutad">Avslutad</option>
+                </select>
               </div>
 
-              <div>
-                <label>Label:</label><br />
-                <input type="text" name="project" value={formData.project} onChange={handleChange} required />
+
+              <div className="modal-footer" style={{ marginTop: "10px" }}>
+                <button type="button" 
+                onClick={() => setIsOpen(false)}
+                className="cancel-btn"
+                >Cancel</button>
+                <button type="submit" className="todo-btn">Add Task</button>
               </div>
 
-              <div>
-                <label>Label Color:</label><br />
-                <input type="color" name="labelcolor" value={formData.labelcolor} onChange={handleChange} required />
-              </div>
-
-              <div style={{ marginTop: "10px" }}>
-                <button type="submit">Add Task</button>
-              </div>
             </form>
+
+           
+
           </div>
         </div>
       )}

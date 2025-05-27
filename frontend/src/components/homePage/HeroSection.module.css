@@ -1,7 +1,7 @@
 .hero {
   display: flex;
-  justify-content: space-between; /* Gör så att text och bild sprids mellan vänster och höger */
-  align-items: center; /* Vertikalt centrera innehållet */
+  justify-content: space-between; 
+  align-items: center; 
   padding: 100px 0;
   background-color: #f5fefe;
 }
@@ -9,25 +9,25 @@
 .contentWrapper {
   display: flex;
   width: 100%;
-  justify-content: space-between; /* Sprid text och bild */
+  justify-content: space-between; 
   align-items: center;
 }
 
 .textContainer {
-  flex: 1; /* Gör så att texten tar upp vänster plats */
-  padding-left: 80px; /* Justera padding för att passa layouten */
-  text-align: left; /* Håll texten vänsterjusterad */
+  flex: 1; 
+  padding-left: 80px; 
+  text-align: left; 
 }
 
 .imageContainer {
-  margin-left: 20px; /* Lägger till lite mellanrum mellan text och bild */
-  flex-shrink: 0; /* Hindrar bilden från att krympa */
+  margin-left: 20px; 
+  flex-shrink: 0; 
 }
 
 .imageContainer img {
   max-width: 100%;
   height: auto;
-  border-radius: 16px; /* Valfritt för snyggare hörn */
+  border-radius: 16px;
 }
 
 
@@ -49,7 +49,7 @@
   
   .buttons {
     display: flex;
-    justify-content: flex-start; /* Justera knapparna till vänster */
+    justify-content: flex-start; 
     gap: 20px;
   }
   
@@ -76,7 +76,42 @@
   .imageContainer img {
     max-width: 100%;
     height: auto;
-    border-radius: 16px; /* valfritt för snyggare hörn */
+    border-radius: 16px; 
+  }
+
+  @media (max-width: 768px) {
+    .hero {
+      padding: 40px 20px;
+    }
+  
+    .contentWrapper {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  
+    .textContainer {
+      padding-left: 0;
+      width: 100%;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+  
+    .imageContainer {
+      margin-left: 0;
+      width: 100%;
+      text-align: center;
+    }
+  
+    .imageContainer img {
+      width: 80%;
+      max-width: 300px;
+      margin: 0 auto;
+      border-radius: 16px;
+    }
+  
+    .buttons {
+      justify-content: center;
+    }
   }
 
 

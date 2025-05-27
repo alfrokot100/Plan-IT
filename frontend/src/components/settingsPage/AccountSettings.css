@@ -1,0 +1,120 @@
+.account-card {
+  background-color: #fff;
+  padding: 32px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  max-width: 800px;
+  margin: 40px auto;
+  font-family: 'Segoe UI', sans-serif;
+  margin-top: 0;
+}
+
+.account-header h2 {
+  font-size: 24px;
+  margin: 0;
+}
+
+.account-header p {
+  margin-top: 4px;
+  color: #666;
+  font-size: 14px;
+}
+
+.form-group {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-group label {
+  font-size: 14px;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+.form-group input,
+.form-group select {
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.password-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.change-btn {
+  padding: 8px 14px;
+  font-size: 14px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.danger-zone {
+  margin-top: 40px;
+  padding-top: 20px;
+  border-top: 1px solid #eee;
+}
+
+.danger-zone-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.danger-icon {
+  font-size: 18px;
+}
+
+.danger-zone-header h3 {
+  margin: 0;
+  font-size: 16px;
+  color: #b91c1c;
+}
+
+.danger-desc {
+  margin-top: 6px;
+  font-size: 14px;
+  color: #777;
+}
+
+.danger-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.danger-btn {
+  padding: 8px 14px;
+  background-color: #fff0f0;
+  border: 1px solid #f87171;
+  color: #b91c1c;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.save-wrapper {
+  margin-top: 30px;
+  text-align: right;
+}
+
+.save-btn {
+  background-color: #2563eb;
+  color: white;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+}
+
+.save-btn:hover {
+  background-color: #1d4ed8;
+}

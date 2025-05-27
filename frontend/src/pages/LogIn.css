@@ -1,10 +1,17 @@
-/* From Uiverse.io by nathann09 */
+
+
+.login-container{
+  display: flex;
+  flex-direction: row;
+}
+
 .form {
   background-color: #fff;
-  display: block;
-  padding: 1rem;
-  max-width: 350px;
-  margin-top: 2rem; /* 🔧 Nytt: Luft ovanför formuläret */
+  display: flex;
+  justify-content: center;
+  padding: 3rem;
+  min-width: 450px;
+  margin-top: 16rem; 
   border-radius: 0.5rem;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
               0 4px 6px -2px rgba(0, 0, 0, 0.05);
@@ -56,7 +63,6 @@
   transition: background-color 0.2s ease;
 }
 
-/* 🔧 Nytt: Hover-effekt */
 .submit:hover {
   background-color: #4338ca;
 }
