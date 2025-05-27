@@ -41,7 +41,9 @@
   - cd "$REACT_FOLDER"
   - export IMAGE_NAME="$CI_REGISTRY_IMAGE/react:$DOCKER_TAG"
   - echo "Building $IMAGE_NAME"
-  - docker buildx build --cache-from="$IMAGE_NAME" -t "$IMAGE_NAME" --push -f Dockerfile-react .
+  - docker buildx build --no-cache -t "$IMAGE_NAME" --push -f Dockerfile-react .
+
+  #- docker buildx build --no-cache-from="$IMAGE_NAME" -t "$IMAGE_NAME" --push -f Dockerfile-react .
   #- docker buildx build --pull -t "$IMAGE_NAME" --push -f Dockerfile-react .
 
   rules:
