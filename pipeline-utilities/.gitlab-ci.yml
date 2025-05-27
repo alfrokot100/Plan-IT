@@ -47,7 +47,7 @@ build-dotnet-image:
 build-react-image:
   extends: .build-react
 
-# Generates an image of MSSQL and loads specified state from SQL file
+# Generates an image of MSSQL and loads specified state from SQL file #
 # Runs on any change to SQL-file
 #build-db-image:
 #  extends: .build-db
