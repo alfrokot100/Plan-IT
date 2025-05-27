@@ -6,6 +6,8 @@ services:
     networks:
       - planit-network
       - traefik-public
+    depends_on:
+      - planit-db
     deploy:
       mode: replicated
       replicas: 1
@@ -26,12 +28,21 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:80
-      # Optional dummy connection string if app requires it
-      # - ConnectionStrings__DefaultConnection=Server=localhost;Database=placeholder;User=none;Password=none;TrustServerCertificate=True
-    # Removed: depends_on: - planit-db
+      - ConnectionStrings__DefaultConnection=Server=planit-db;Database=PlanItDb;User Id=sa;Password=YourStrong!Passw0rd;TrustServerCertificate=True
+
+  planit-db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=planit
+    networks:
+      - planit-network
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker  # optional: restrict to workers
 
 networks:
   planit-network:
   traefik-public:
     external: true
-
