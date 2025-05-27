@@ -34,7 +34,7 @@ services:
     image: mcr.microsoft.com/mssql/server:2022-latest
     environment:
       - ACCEPT_EULA=Y
-      - SA_PASSWORD=planit
+      - SA_PASSWORD=PlAn@iT!521
     networks:
       - planit-network
     deploy:
