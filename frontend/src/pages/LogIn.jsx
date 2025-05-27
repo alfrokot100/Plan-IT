@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './LogIn.css';
-import PublicNavbar from '../components/navbar/PublicNavbar';
-import LoginBackground from '../components/LoginBackground';
+import PublicNavbar from '../components/navbar/PublicNavbar.css';
+import LoginBackground from '../components/LoginBackground.css';
 
 export default function LogIn() {
   return (
